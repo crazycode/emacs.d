@@ -1,0 +1,48 @@
+安装方法：
+1、从svn或copy得到emacs.d目录，放到~目录下，重命名为.emacs.ext
+2、修改.emacs，加入以下内容(或参考sample.emacs)：
+(load "~/.emacs.ext/plugins/subdirs.el")
+(mapc 'load (directory-files "~/.emacs.ext/config" t "\.el$")) 
+
+
+
+目前包括以下插件：
+1、emacs on rails (包括需要的ruby-mode/snippet/find-recursive)
+2、mmm-mode  
+3、color-theme (http://download.gna.org/color-theme/ 6.6.0)
+4、psvn
+5、yaml-mode (svn: http://svn.clouder.jp/repos/public/yaml-mode/trunk/  #151)
+
+很多时候,emacs并不是按照你的想像去启动的.你会发现它可能启动后占据了两个或更多窗口.或者,你喜欢全屏工作方式,但每次启动后最大化总是一件很麻烦的事情.在日常应用中,我总结了以下两种方法,
+第一种方法:
+在你的 ~/.Xdefaults 中增加下面这行
+Emacs.geometry: 80x30
+然后运行 xrdb ~/.Xdefaults
+这样emacs的启动窗口就被设为80列x30行的大小
+你可以按照自己的要求设置
+Emacs.geometry: WIDTHxHEIGHT+XOFF+YOFF
+其中WIDTH, HEIGHT分别表示窗口的宽度和高度，可选的XOFF和YOFF表示启动窗口的左上角座标。
+例如：
+Emacs.geometry: 80x30+20+10
+表示令窗口大小为80x30，启动后左上角处于(20,10)处,很简单,不是么
+
+第二种方法:
+在配置文件中配置,配置文件通常在你的用户目录,为.emacsrc.
+加入下面一行:
+(setq default-frame-alist
+'((height . 35) (width . 100) (menu-bar-lines . 20) (tool-bar-lines . 0)))
+由于后一种是写在配置文件中的,所以相对来说比较方便.比较方便
+
+===================================
+对于T43，为了使用右Alt，修改为使用backford键映射为windows键，需要一段时间来熟悉：
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
+"Scancode Map"=hex:00,00,00,00,00,00,00,00,02,00,00,00,5c,e0,6a,e0,00,00,00,00
+
+这是映射右alt为windows的方法:
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
+"Scancode Map"=hex:00,00,00,00,00,00,00,00,01,00,00,00,5b,e0,38,e0,00,00,00,00
+

@@ -1,0 +1,31 @@
+(custom-set-variables
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(column-number-mode t)
+ '(current-language-environment "UTF-8")
+ '(ecb-options-version "2.32")
+ '(global-linum-mode t)
+ '(make-backup-files nil)
+ '(scroll-bar-mode nil)
+ '(show-paren-mode t))
+(custom-set-faces
+  ;; custom-set-faces was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+ '(flymake-errline ((((class color)) (:background "DarkRed"))))
+ '(flymake-warnline ((((class color)) (:background "DarkBlue")))))
+
+;; ;; make #! scripts executable after saving them
+(add-hook 'after-save-hook 'executable-make-buffer-file-executable-if-script-p)
+;;
+
+(load "~/.emacs.d/init.el")
+
+;;(make-variable-buffer-local 'yas/trigger-key)
+;;(add-hook 'ruby-mode-hook ;; or rails-minor-mode-hook ?
+;;          '(lambda ()
+;;             (setq yas/trigger-key
+;;                   (kbd "<tab>")))) 
