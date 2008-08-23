@@ -79,10 +79,18 @@ otherwise if set REVERSE convert from remote to local."
                                                    command
                                                    command-args))
        (setq command rails-cmd-proxy:remote-cmd))
-     (start-process-shell-command name
-                                  buffer
-                                  command
-                                  command-args))))
+
+;;;      (start-process-shell-command name
+;;;                                   buffer
+;;;                                   command
+;;;                                   command-args))))
+     (let ((process (start-process-shell-command name
+                                                 buffer
+                                                 command
+                                                 command-args)))
+       (set-process-filter process
+                           'ansi-color-insertion-filter)
+       process)))) 
 
 (defun rails-cmd-proxy:shell-command-to-string (command)
   (rails-project:with-root
@@ -117,4 +125,15 @@ otherwise if set REVERSE convert from remote to local."
                                 (string-repeat " " (- (length (match-string 1)) 1)))
                         nil t nil 1))))))
 
+(defun ansi-color-insertion-filter (proc string)
+  (with-current-buffer (process-buffer proc)
+    (let ((moving (= (point) (process-mark proc))))
+      (save-excursion
+        ;; Insert the text, advancing the process marker.
+        (goto-char (process-mark proc))
+        ;; decode ansi color sequences
+        (insert (ansi-color-apply string))
+        (set-marker (process-mark proc) (point)))
+      (if moving (goto-char (process-mark proc))))))
+ 
 (provide 'rails-cmd-proxy)
