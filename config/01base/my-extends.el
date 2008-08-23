@@ -114,3 +114,16 @@
 (global-set-key (quote [M-up]) (quote move-region-up))
 (global-set-key (quote [M-down]) (quote move-region-down))
 (global-set-key "\C-c\C-c2" 'circle-windows)
+
+(add-hook 'shell-mode-hook 'my-shell-mode-hook-func)
+(defun my-shell-mode-hook-func ()
+  (set-process-sentinel (get-buffer-process (current-buffer))
+         #'my-shell-mode-kill-buffer-on-exit)
+     )
+(defun my-shell-mode-kill-buffer-on-exit (process state)
+     (message "%s" state)
+     (if (or
+     (string-match "exited abnormally with code.*" state)
+     (string-match "finished" state))
+     (kill-buffer (current-buffer))))
+(global-set-key "\C-x\M-r" 'term)
