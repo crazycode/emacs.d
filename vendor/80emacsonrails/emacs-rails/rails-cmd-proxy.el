@@ -65,6 +65,29 @@ otherwise if set REVERSE convert from remote to local."
 
 ;; remote wrappers
 
+(defun rails-cmd-proxy:start-process-color (name buffer command command-args)
+  ""
+  (rails-project:with-root
+   (root)
+   (let ((proxy-struct (rails-cmd-proxy:lookup root))
+         (command command)
+         (command-args command-args))
+     (when proxy-struct
+       (setq command-args
+             (rails-cmd-proxy:construct-remote-cmd proxy-struct
+                                                   root
+                                                   command
+                                                   command-args))
+       (setq command rails-cmd-proxy:remote-cmd))
+
+     (let ((process (start-process-shell-command name
+                                                 buffer
+                                                 command
+                                                 command-args)))
+       (set-process-filter process
+                           'ansi-color-insertion-filter)
+       process)))) 
+
 (defun rails-cmd-proxy:start-process (name buffer command command-args)
   ""
   (rails-project:with-root
@@ -80,17 +103,11 @@ otherwise if set REVERSE convert from remote to local."
                                                    command-args))
        (setq command rails-cmd-proxy:remote-cmd))
 
-;;;      (start-process-shell-command name
-;;;                                   buffer
-;;;                                   command
-;;;                                   command-args))))
-     (let ((process (start-process-shell-command name
-                                                 buffer
-                                                 command
-                                                 command-args)))
-       (set-process-filter process
-                           'ansi-color-insertion-filter)
-       process)))) 
+     (start-process-shell-command name
+                                  buffer
+                                  command
+                                  command-args))))
+
 
 (defun rails-cmd-proxy:shell-command-to-string (command)
   (rails-project:with-root

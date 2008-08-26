@@ -90,7 +90,7 @@ using `rails-default-environment'."
               (env (if env env rails-default-environment))
               (command (rails-ws:compute-server-conmmand rails-ws:default-server-type rails-ws:port env))
               (proc
-               (rails-cmd-proxy:start-process rails-ruby-command
+               (rails-cmd-proxy:start-process-color rails-ruby-command
                                               rails-ws:buffer-name
                                               (car command)
                                               (cadr command))))
