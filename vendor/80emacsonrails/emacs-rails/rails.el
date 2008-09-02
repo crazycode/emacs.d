@@ -418,7 +418,7 @@ necessary."
             (local-set-key (if rails-use-another-define-key
                                (kbd "TAB") (kbd "<tab>"))
                            'indent-and-complete)
-            (local-set-key (rails-key "a") '(lambda()
+            (local-set-key (rails-key "o") '(lambda()
                                               (interactive)
                                               (mouse-major-mode-menu (rails-core:menu-position))))
             (local-set-key (kbd "C-:") 'ruby-toggle-string<>simbol)
