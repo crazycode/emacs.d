@@ -4,6 +4,8 @@
 (load "~/.emacs.ext/plugins/subdirs.el")
 (mapc 'load (directory-files "~/.emacs.ext/config" t "\.el$")) 
 
+从CVS编译方法：
+./configure --prefix=/usr/local/emacs23 --with-xft --with-fretype --enable-font-backend --with-x-toolkit=gtk --with-freetype2 --with-x --with-xpm --with-jpeg --with-tiff --with-gif --with-png
 
 
 目前包括以下插件：
