@@ -153,3 +153,10 @@ scroll-conservatively 10000)
 ;;(require 'browse-kill-ring)
 ;;(global-set-key [(control c)(k)] 'browse-kill-ring)
 
+;; 设置ctrl+<tab>转换buffer.
+(defalias 'switch-to-next-buffer 'bury-buffer)
+(defun switch-to-previous-buffer ()
+  (interactive)
+  (switch-to-buffer (nth (- (length (buffer-list)) 1) (buffer-list))))
+(global-set-key [C-tab] 'switch-to-previous-buffer)
+(global-set-key [C-S-tab] 'switch-to-next-buffer)

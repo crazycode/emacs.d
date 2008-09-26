@@ -1,4 +1,4 @@
-(set-default-font "DejaVu Sans Mono-10")
+(set-default-font "DejaVu Sans Mono-9")
 (set-fontset-font (frame-parameter nil 'font)
           'unicode '("Microsoft YaHei" . "unicode-bmp")) 
 (set-fontset-font (frame-parameter nil 'font)
