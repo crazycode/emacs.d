@@ -5,8 +5,12 @@
 (mapc 'load (directory-files "~/.emacs.ext/config" t "\.el$")) 
 
 从CVS编译方法：
-./configure --prefix=/usr/local/emacs23 --with-xft --with-fretype --enable-font-backend --with-x-toolkit=gtk --with-freetype2 --with-x --with-xpm --with-jpeg --with-tiff --with-gif --with-png
+cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/emacs co emacs
 
+./configure --prefix=/usr/local/emacs23 --with-xft --with-fretype --enable-font-backend --with-x-toolkit=gtk --with-freetype2 --with-x --with-xpm --with-jpeg --with-tiff --with-gif --with-png
+make bootstrap
+make
+sudo make install
 
 目前包括以下插件：
 1、emacs on rails (包括需要的ruby-mode/snippet/find-recursive)
