@@ -272,7 +272,7 @@
        ("shoulds" "should \"$${description}\" do\n$>flunk\nend$>\n\n$>shoulds$." "several should blocks")
        ("shoulde" "should_eventually \"$${description}\" do\n $>$.\nend$>" "should_eventually block")
        ("shouldes" "should_eventually \"$${description}\"\n$>shouldes$." "several should_eventually statements")
-       ("laf" "load_all_fixtures" "load_all_fixtures")
+       ("laf" "fixtures :all" "fixtures :all")
        ("sat" "should_assign_to :$${variable}" "should_assign_to")
        ("savf" "should_allow_values_for :$${attribute}" "should_allow_values_for")
        ("sbt" "should_belong_to :$${object}" "should_belong_to")
@@ -316,6 +316,8 @@
        ("ass" "assert_same $${expected}, $${actual}" "assert_same(...)")
        ("assd" "assert_send [$${object}, :$${message}, $${args}]" "assert_send(...)")
        ("ast" "assert_throws :$${expected} { $. }" "assert_throws(...) { ... }")
+       ("asd" "assert_difference \"$${count}\", $${1} do\n$>$.\nend$>" "assert_difference .. do .. end")
+       ("asnd" "assert_no_difference \"$${count}\" do\n$>$.\nend$>" "assert_no_difference .. do .. end")
        ("astm" "assert_template '$${index}'" "assert_template"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
