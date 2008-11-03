@@ -2,7 +2,7 @@
 
 
 (setq rails-api-root "/usr/lib/ruby/gems/1.8/doc")
-(setq ri-ruby-script "~/.emacs.ext/site-lisp/ri-emacs/ri-emacs.rb")
+(setq ri-ruby-script "~/.emacs.d/vendor/20language/ri-emacs/ri-emacs.rb")
 (autoload 'ri "ri-ruby" nil t)
 
 (add-hook 'ruby-mode-hook  

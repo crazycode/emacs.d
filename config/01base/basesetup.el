@@ -85,12 +85,12 @@ scroll-conservatively 10000)
 ;;删掉不属于以上7中版本的版本
 (setq delete-old-versions t)
 ;;设置备份文件的路径
-(setq backup-directory-alist '(("." . "~/.emacs.ext/tmp")))
+(setq backup-directory-alist '(("." . "~/.emacs.d/tmp")))
 ;;备份设置方法，直接拷贝
 (setq backup-by-copying t)
 
  ;; 所有的备份文件转移到~/backups目录下
-(setq backup-directory-alist (quote (("." . "~/.emacs.ext/tmp"))))
+(setq backup-directory-alist (quote (("." . "~/.emacs.d/tmp"))))
 ;; Emacs 中，改变文件时，默认都会产生备份文件(以 ~ 结尾的文件)。可以完全去掉
 ;; (并不可取)，也可以制定备份的方式。这里采用的是，把所有的文件备份都放在一
 ;; 个固定的地方("~/var/tmp")。对于每个备份文件，保留最原始的两个版本和最新的
