@@ -3,7 +3,7 @@
 (yas/initialize)
 (yas/load-directory
  (concat (file-name-directory (or load-file-name buffer-file-name))
-	 "~/.emacs.d/vendor/70rinari/yasnippets-rails/rails-snippets/"))
+	 "../../vendor/70rinari/yasnippets-rails/rails-snippets/"))
 
 ;;; If you are using MuMaMo or nxml, you will need to tweak the mumamo
 ;;; keymap to let tab work for yasnippets
