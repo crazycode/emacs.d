@@ -53,7 +53,7 @@
 
 ;;设置错误行背景颜色
 ;;(set-face-background (quote flymake-errline) "#962433")
+
 (custom-set-faces
  '(flymake-errline ((((class color)) (:background "DarkRed"))))
  '(flymake-warnline ((((class color)) (:background "DarkBlue")))))
-

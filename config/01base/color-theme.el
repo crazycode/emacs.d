@@ -10,4 +10,6 @@
 ;;(color-theme-tty-dark)
 ;;(color-theme-comidia)  ;;2008-03-01
 
+;;(color-theme-emacs-nw)
+
 (color-theme-blue)
