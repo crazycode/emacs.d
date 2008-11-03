@@ -43,7 +43,7 @@
           (insert  "\n")
           (split-window-vertically)
           (other-window 1)
-          (find-file (concat "_" name ".rhtml"))
+          (find-file (concat "_" name ".html.erb"))
           (goto-char (point-min))
           (erase-buffer)
           (insert content)
