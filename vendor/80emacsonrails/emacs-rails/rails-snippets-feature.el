@@ -210,7 +210,7 @@
        ("rns" "render :nothing => $${true}, :status => $${401}" "render (nothing, status)")
        ("rp" "render :partial => '$${item}'" "render (partial)")
        ("rpc" "render :partial => '$${item}', :collection => $${items}" "render (partial, collection)")
-       ("rpl" "render :partial => '$${item}', :locals => { :$${name} => '$${value}'$${4} }" "render (partial, locals)")
+       ("rpl" "render :partial => '$${item}', :locals => { :$${name} => $${value} }" "render (partial, locals)")
        ("rpo" "render :partial => '$${item}', :object => $${object}" "render (partial, object)")
        ("rcea" "render_component :action => '$${index}'" "render_component (action)")
        ("rcec" "render_component :controller => '$${items}'" "render_component (controller)")
