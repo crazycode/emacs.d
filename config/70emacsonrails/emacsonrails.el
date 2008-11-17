@@ -54,6 +54,15 @@
 ;;设置错误行背景颜色
 ;;(set-face-background (quote flymake-errline) "#962433")
 
+;;mmm-output-submode-face
+;;mmm-code-submode-face
+
 (custom-set-faces
  '(flymake-errline ((((class color)) (:background "DarkRed"))))
  '(flymake-warnline ((((class color)) (:background "DarkBlue")))))
+;; (custom-set-faces
+;;  '(flymake-errline ((((class color)) (:background "#CFCFCF"))))
+;;  '(flymake-warnline ((((class color)) (:background "#CFCFCF")))))
+;; ;;(set-face-background (quote flymake-errline) "#F0F0F0")
+;; (set-face-background (quote mmm-output-submode-face) "#F0F0F0")
+;; (set-face-background (quote mmm-code-submode-face) "#F0F0F0")
