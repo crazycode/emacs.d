@@ -173,6 +173,8 @@
        ("%ifel" "<% if $${cond} -%>\n$.\n<% else -%>\n<% end -%>" "<% if/else/end %>")
        ("%unless" "<% unless $${cond} -%>\n$.\n<% end -%>" "<% unless/end %>")
        ("%for" "<% for $${elem} in @$${list} %>\n$>$.\n<% end %>$>" "<% for/end %>")
+       ("han" "$${Model}.human_attribute_name('$${title}')" "human_attribute_name")
+       ("hn" "$${Model}.human_name" "human_name")
        ("%" "<% $. -%>" "<% ... %>")
        ("%%" "<%= $. %>" "<%= ... %>")) ; erb
     (0 "controller" rails-controller-minor-mode-abbrev-table
