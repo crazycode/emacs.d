@@ -66,13 +66,15 @@
 (defvar ruby-compilation-executable "ruby"
   "What bin to use to launch the tests. Override if you use JRuby etc.")
 
+(defvar ruby-compilation-test-name-flag "-n"
+  "What flag to use to specify that you want to run a single test.")
+
 (defun ruby-compilation-run (cmd)
   "Run a ruby process dumping output to a ruby compilation buffer."
   (interactive "FRuby Comand: ")
   (let ((name (file-name-nondirectory (car (split-string cmd))))
 	(cmdlist (cons ruby-compilation-executable
-                       ;; What on earth is ruby-args-to-list?
-                       (ruby-args-to-list (expand-file-name cmd)))))
+                       (split-string (expand-file-name cmd)))))
     (pop-to-buffer (ruby-compilation-do name cmdlist))))
 
 (defun ruby-compilation-rake (&optional edit task)
@@ -85,7 +87,7 @@
 		      task)))
     (pop-to-buffer (ruby-compilation-do
 		    "rake" (cons "rake"
-				 (ruby-args-to-list rake-args))))))
+				 (split-string rake-args))))))
 
 (defun ruby-compilation-this-buffer ()
   "Run the current buffer through Ruby compilation."
@@ -95,18 +97,23 @@
 (defun ruby-compilation-this-test ()
   "Run the test at point through Ruby compilation."
   (interactive)
-  (let ((method (which-function)))
-    (if (or (not method)
-            (not (string-match "#test_" method)))
+  (let ((test-name (ruby-compilation-this-test-name)))
+    (pop-to-buffer (ruby-compilation-do
+                    (format "ruby: %s - %s"
+                            (file-name-nondirectory (buffer-file-name))
+                            test-name)
+                    (list ruby-compilation-executable
+                          (buffer-file-name)
+                          ruby-compilation-test-name-flag test-name)))))
+
+(defun ruby-compilation-this-test-name ()
+  "Which test are we currently in?"
+  (let ((this-test (which-function)))
+    (if (listp this-test) (setq this-test (car this-test)))
+    (if (or (not this-test)
+            (not (string-match "#test_" this-test)))
         (message "Point is not in a test.")
-      (let ((test-name (cadr (split-string method "#"))))
-        (pop-to-buffer (ruby-compilation-do
-                        (format "ruby: %s - %s"
-                                (file-name-nondirectory (buffer-file-name))
-                                test-name)
-                        (list ruby-compilation-executable
-                              (buffer-file-name)
-                              "-n" test-name)))))))
+      (cadr (split-string this-test "#")))))
 
 (defun ruby-compilation-do (name cmdlist)
   (let ((comp-buffer-name (format "*%s*" name)))
@@ -163,6 +170,7 @@ compilation buffer."
 
 (defvar ruby-compilation-minor-mode-map
   (let ((map (make-sparse-keymap)))
+    (define-key map "q"    'quit-window)
     (define-key map "p"    'previous-error-no-select)
     (define-key map "n"    'next-error-no-select)
     (define-key map "\M-p" 'ruby-compilation-previous-error-group)
@@ -184,5 +192,10 @@ compilation buffer."
      (define-key ruby-mode-map (kbd "C-x t") 'ruby-compilation-this-buffer)
      (define-key ruby-mode-map (kbd "C-x C-t") 'ruby-compilation-this-test)))
 
+;; So we don't get warnings with .dir-settings.el files
+(dolist (executable (list "jruby" "rbx" "ruby1.9" "ruby1.8" "ruby"))
+  (add-to-list 'safe-local-variable-values
+               (cons 'ruby-compilation-executable executable)))
+   
 (provide 'ruby-compilation)
 ;;; ruby-compilation.el ends here
