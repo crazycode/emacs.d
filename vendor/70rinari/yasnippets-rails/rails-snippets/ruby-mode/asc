@@ -1,0 +1,3 @@
+#name : shoulda assert_contains
+# --
+assert_contains ${1:collection}, ${2:x}

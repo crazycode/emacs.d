@@ -1,3 +1,5 @@
 # This was cloned from a TextMate bundle for yasnippet.
 # --
-partition { |${1:e}| $0 }
+namespace :${1:${TM_FILENAME/\.\w+//}} do
+	$0
+end

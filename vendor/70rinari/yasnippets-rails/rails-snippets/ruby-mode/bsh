@@ -1,0 +1,5 @@
+#name : shoulda before should block
+# --
+before_should "$1" do
+  $0
+end

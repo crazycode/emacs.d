@@ -1,0 +1,3 @@
+#name : shoulda assert_save
+# --
+assert_contains ${1:object}

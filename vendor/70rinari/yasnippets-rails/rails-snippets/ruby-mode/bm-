@@ -1,3 +1,6 @@
 # This was cloned from a TextMate bundle for yasnippet.
 # --
-partition { |${1:e}| $0 }
+TESTS = ${1:10_000}
+Benchmark.bmbm do |results|
+  $0
+end

@@ -1,0 +1,8 @@
+#name : shoulda context block with setup
+# --
+context "${description}" do
+  setup do
+    ${setup}
+  end
+ sh$0
+end

@@ -1,0 +1,7 @@
+#name : shoulda several should blocks
+# --
+should "${description}" do
+  flunk
+end
+
+shs$0

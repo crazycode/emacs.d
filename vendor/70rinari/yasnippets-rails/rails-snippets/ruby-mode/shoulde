@@ -1,0 +1,5 @@
+#name : shoulda should_eventually block
+# --
+should_eventually "${description}" do
+  $0
+end
