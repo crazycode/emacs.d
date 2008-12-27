@@ -1,6 +1,14 @@
 (require 'ruby-mode)
 (require 'ruby-test)
 
+ (setq ri-ruby-script "/home/ridge/.emacs.d/vendor/20language/ri-emacs/ri-emacs.rb")
+ (autoload 'ri "/home/ridge/.emacs.d/vendor/20language/ri-emacs/ri-ruby.el" nil t)
+ (add-hook 'ruby-mode-hook (lambda ()
+	 		    (local-set-key 'fi 'ri)
+			    (local-set-key "\M-\C-i" 'ri-ruby-complete-symbol)
+			    (local-set-key 'f4 'ri-ruby-show-args)
+			    ))
+
 (require 'anything)
 (require 'anything-rcodetools)
 ;; Command to get all RI entries.
