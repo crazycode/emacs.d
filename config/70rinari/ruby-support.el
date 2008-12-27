@@ -34,6 +34,7 @@
   (define-key ruby-mode-map "\C-c\C-f" 'rct-ri))
 (add-hook 'ruby-mode-hook 'ruby-mode-hook-rcodetools)
 
+(require 'rails-lib)
 (require 'rails-ruby)
 
 (add-hook 'ruby-mode-hook
