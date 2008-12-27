@@ -4,6 +4,13 @@
 (load "~/.emacs.ext/plugins/subdirs.el")
 (mapc 'load (directory-files "~/.emacs.ext/config" t "\.el$")) 
 
+== 需要安装的其它软件 ==
+在分支rinari中，引入了一些插件，需要安装以下东东:
+sudo gem install fastri  # 代替RI的东东
+sudo gem install rcodetools
+
+
+==== 从CVS安装emacs23的备注 ====
 从CVS编译方法：
 cvs -z3 -d:pserver:anonymous@cvs.sv.gnu.org:/sources/emacs co emacs
 
@@ -12,8 +19,9 @@ make bootstrap
 make
 sudo make install
 
+=== master分支 ===
 目前包括以下插件：
-1、emacs on rails (包括需要的ruby-mode/snippet/find-recursive)
+1、emacs on rails (包括需要的ruby-mode/snippet/find-recursive) => 分支rinari中使用rinari.el
 2、mmm-mode  
 3、color-theme (http://download.gna.org/color-theme/ 6.6.0)
 4、psvn
@@ -40,7 +48,7 @@ Emacs.geometry: 80x30+20+10
 由于后一种是写在配置文件中的,所以相对来说比较方便.比较方便
 
 ===================================
-对于T43，为了使用右Alt，修改为使用backford键映射为windows键，需要一段时间来熟悉：
+对于T43/Windows，因为之前使用了右Alt作为Win键，现在emacs为了使用右Alt，修改为使用backford键映射为windows键，需要一段时间来熟悉：
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Keyboard Layout]
