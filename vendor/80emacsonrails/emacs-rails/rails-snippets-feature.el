@@ -317,9 +317,9 @@
        ("asrt" "assert_respond_to $${object}, :$${method}" "assert_respond_to(...)")
        ("ass" "assert_same $${expected}, $${actual}" "assert_same(...)")
        ("assd" "assert_send [$${object}, :$${message}, $${args}]" "assert_send(...)")
-       ("ast" "assert_throws :$${expected} { $. }" "assert_throws(...) { ... }")
        ("asd" "assert_difference \"$${count}\", $${1} do\n$>$.\nend$>" "assert_difference .. do .. end")
        ("asnd" "assert_no_difference \"$${count}\" do\n$>$.\nend$>" "assert_no_difference .. do .. end")
+       ("ast" "assert_throws :$${expected} { $. }" "assert_throws(...) { ... }")
        ("astm" "assert_template '$${index}'" "assert_template"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

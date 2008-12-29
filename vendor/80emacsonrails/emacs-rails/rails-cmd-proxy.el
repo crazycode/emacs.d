@@ -79,7 +79,6 @@ otherwise if set REVERSE convert from remote to local."
                                                    command
                                                    command-args))
        (setq command rails-cmd-proxy:remote-cmd))
-
      (let ((process (start-process-shell-command name
                                                  buffer
                                                  command
@@ -102,12 +101,10 @@ otherwise if set REVERSE convert from remote to local."
                                                    command
                                                    command-args))
        (setq command rails-cmd-proxy:remote-cmd))
-
      (start-process-shell-command name
                                   buffer
                                   command
                                   command-args))))
-
 
 (defun rails-cmd-proxy:shell-command-to-string (command)
   (rails-project:with-root
@@ -152,5 +149,5 @@ otherwise if set REVERSE convert from remote to local."
         (insert (ansi-color-apply string))
         (set-marker (process-mark proc) (point)))
       (if moving (goto-char (process-mark proc))))))
- 
+
 (provide 'rails-cmd-proxy)

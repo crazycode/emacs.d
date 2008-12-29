@@ -80,7 +80,11 @@
       ([goto-unit-tests]  '("Go to Unit Tests"       . rails-nav:goto-unit-tests))
       ([goto-func-tests]  '("Go to Functional Tests" . rails-nav:goto-functional-tests))
       ([goto-models]      '("Go to Models"           . rails-nav:goto-models))
-      ([goto-controllers] '("Go to Controllers"      . rails-nav:goto-controllers)))
+      ([goto-controllers] '("Go to Controllers"      . rails-nav:goto-controllers))
+      ([goto-rspec-controllers] '("Go to RSpec Controllers" . rails-nav:goto-rspec-controllers))
+      ([goto-rspec-lib]         '("Go to RSpec Lib"         . rails-nav:goto-rspec-lib))
+      ([goto-rspec-models]      '("Go to RSpec Models"      . rails-nav:goto-rspec-models))
+      ([goto-rspec-fixtures]    '("Go to RSpec Fixtures"    . rails-nav:goto-rspec-fixtures)))
     map))
 
 (defconst rails-minor-mode-tests-menu-bar-map
@@ -229,6 +233,10 @@
   ((rails-key "\C-c g x") 'rails-nav:goto-fixtures)
   ((rails-key "\C-c g f") 'rails-nav:goto-functional-tests)
   ((rails-key "\C-c g u") 'rails-nav:goto-unit-tests)
+  ((rails-key "\C-c g r c") 'rails-nav:goto-rspec-controllers)
+  ((rails-key "\C-c g r f") 'rails-nav:goto-rspec-fixtures)
+  ((rails-key "\C-c g r l") 'rails-nav:goto-rspec-lib)
+  ((rails-key "\C-c g r m") 'rails-nav:goto-rspec-models)
 
   ;; Switch
   ((kbd "<M-S-up>")      'rails-lib:run-primary-switch)
@@ -278,17 +286,22 @@
   ((rails-key "\C-c d p") 'rails-rake:migrate-to-prev-version)
   ((rails-key "\C-c d t") 'rails-rake:clone-development-db-to-test-db)
 
-
-
   ;; Tests
   ((rails-key "\C-c r")   'rails-rake:task)
   ((rails-key "\C-c t")   'rails-test:run)
   ((rails-key "\C-c .")   'rails-test:run-current)
-  ((rails-key "\C-c y i")   'rails-test:run-integration)
-  ((rails-key "\C-c y u")   'rails-test:run-units)
-  ((rails-key "\C-c y f")   'rails-test:run-functionals)
+  ((rails-key "\C-c y i") 'rails-test:run-integration)
+  ((rails-key "\C-c y u") 'rails-test:run-units)
+  ((rails-key "\C-c y f") 'rails-test:run-functionals)
   ((rails-key "\C-c #")   'rails-test:run-recent)
-  ((rails-key "\C-c y a")   'rails-test:run-all)
+  ((rails-key "\C-c y a") 'rails-test:run-all)
+
+  ;; RSpec
+  ((rails-key "\C-c z f") 'rails-spec:run-files)
+  ((rails-key "\C-c z .") 'rails-spec:run-this-file)
+  ((rails-key "\C-c z a") 'rails-spec:run-all)
+  ((rails-key "\C-c z l") 'rails-spec:run-last)
+  ((rails-key "\C-c z s") 'rails-spec:run-this-spec)
 
   ;; Log files
   ((rails-key "\C-c l")    'rails-log:open)

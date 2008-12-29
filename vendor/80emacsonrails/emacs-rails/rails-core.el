@@ -35,12 +35,17 @@
     "app/helpers"
     "test/unit"
     "test/functional"
-    "test/fixtures")
+    "test/fixtures"
+    "spec/controllers"
+    "spec/fixtures"
+    "spec/lib"
+    "spec/models"
+    "lib")
   "Directories with Rails classes")
 
 (defun rails-core:class-by-file (filename)
   "Return the class associated with FILENAME.
-   <rails-root>/(app/models|app/controllers|app/helpers|test/unit|test/functional)/foo/bar_baz
+   <rails-root>/(app/models|app/controllers|app/helpers|test/unit|test/functional|lib|spec/controllers|spec/lib|spec/models)/foo/bar_baz
                 --> Foo::BarBaz"
   (let* ((case-fold-search nil)
          (path (replace-regexp-in-string
@@ -313,6 +318,50 @@ CONTROLLER."
       controller
     (concat controller "Controller")))
 
+(defun rails-core:rspec-controller-file (controller)
+  "Return the controller spec file name for the controller named
+CONTROLLER."
+  (when controller
+    (format "spec/controllers/%s_spec.rb"
+            (rails-core:file-by-class (rails-core:long-controller-name controller) t))))
+
+(defun rails-core:lib-file (lib-name)
+  "Return the model file from the lib name."
+  (when lib-name
+    (concat "lib/" (rails-core:file-by-class lib-name))))
+
+(defun rails-core:rspec-lib-file (lib)
+  "Return the lib spec file name for the lib named LIB."
+  (when lib
+    (format "spec/lib/%s_spec.rb" (rails-core:file-by-class lib t))))
+
+(defun rails-core:rspec-model-file (model)
+  "Return the model spec file name for the model named MODEL."
+  (when model
+    (format "spec/models/%s_spec.rb" (rails-core:file-by-class model t))))
+
+(defun rails-core:rspec-fixture-file (model)
+  "Return the rspec fixtures file name for the model named MODEL."
+  (when model
+    (format "spec/fixtures/%s.yml" (pluralize-string (rails-core:file-by-class model t)))))
+
+(defun rails-core:rspec-lib-exist-p (lib)
+  "Return the lib spec file name for the model named MODEL."
+  (let ((spec (rails-core:rspec-lib-file lib)))
+    (when spec
+      (file-exists-p (rails-core:file spec)))))
+
+(defun rails-core:rspec-model-exist-p (model)
+  "Return the model spec file name for the model named MODEL."
+  (let ((spec (rails-core:rspec-model-file model)))
+    (when spec
+      (file-exists-p (rails-core:file spec)))))
+
+(defun rails-core:rspec-fixture-exist-p (model)
+  (when model
+    (file-exists-p
+     (rails-core:file (rails-core:rspec-fixture-file model)))))
+
 ;;;;;;;;;; Functions that return collection of Rails objects  ;;;;;;;;;;
 (defun rails-core:observer-p (name)
   (when name
@@ -483,6 +532,29 @@ If the action is nil, return all views for the controller."
   "Return the parent classes of controllers."
   (rails-core:extract-ancestors (rails-core:controllers)))
 
+(defun rails-core:rspec-controllers ()
+  "Return a list of Rails controller specs."
+  (mapcar
+   #'(lambda(it)
+       (remove-postfix (rails-core:class-by-file it)
+                       "Spec"))
+   (find-recursive-files "\\.rb$" (rails-core:file "spec/controllers/"))))
+
+(defun rails-core:rspec-models ()
+  "Return a list of Rails model specs."
+  (mapcar
+   #'(lambda(it)
+       (remove-postfix (rails-core:class-by-file it)
+                       "Spec"))
+   (find-recursive-files "\\.rb$" (rails-core:file "spec/models/"))))
+
+(defun rails-core:rspec-fixtures ()
+  "Return a list of Rails RSpec fixtures."
+  (mapcar
+   #'(lambda (l)
+       (replace-regexp-in-string "\\.[^.]+$" "" l))
+   (find-recursive-files "\\.yml$" (rails-core:file "spec/fixtures/"))))
+
 ;;;;;;;;;; Getting Controllers/Model/Action from current buffer ;;;;;;;;;;
 
 (defun rails-core:current-controller ()
@@ -494,7 +566,8 @@ If the action is nil, return all views for the controller."
         (:view (rails-core:class-by-file
                 (directory-file-name (directory-of-file (buffer-file-name)))))
         (:helper (remove-postfix file-class "Helper"))
-        (:functional-test (remove-postfix file-class "ControllerTest"))))))
+        (:functional-test (remove-postfix file-class "ControllerTest"))
+        (:rspec-controller (remove-postfix file-class "Spec"))))))
 
 (defun rails-core:current-model ()
   "Return the current Rails model."
@@ -504,7 +577,17 @@ If the action is nil, return all views for the controller."
         (:migration (rails-core:model-by-migration-filename (buffer-name)))
         (:model file-class)
         (:unit-test (remove-postfix file-class "Test"))
-        (:fixture (singularize-string file-class))))))
+        (:fixture (singularize-string file-class))
+        (:rspec-fixture (singularize-string file-class))
+        (:rspec-model (remove-postfix file-class "Spec"))))))
+
+(defun rails-core:current-lib ()
+  "Return the current lib."
+  (let* ((file-class (rails-core:class-by-file (buffer-file-name))))
+    (unless (rails-core:mailer-p file-class)
+      (case (rails-core:buffer-type)
+        (:lib file-class)
+        (:rspec-lib (remove-postfix file-class "Spec"))))))
 
 (defun rails-core:current-mailer ()
   "Return the current Rails Mailer, else return nil."
@@ -670,5 +753,9 @@ the Rails minor mode log."
 (defun rails-core:rhtml-buffer-p ()
   "Return non nil if the current buffer is rhtml file."
   (string-match "\\.html.erb$" (buffer-file-name)))
+
+(defun rails-core:spec-exist-p ()
+  "Return non nil if spec directory is exist."
+  (file-exists-p (rails-core:file "spec")))
 
 (provide 'rails-core)

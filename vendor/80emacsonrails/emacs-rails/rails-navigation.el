@@ -136,6 +136,46 @@
    (lambda (plugin)
      (concat "vendor/plugins/" plugin "/init.rb"))))
 
+(defun rails-nav:goto-rspec-controllers ()
+  "Go to controller specs."
+  (interactive)
+  (rails-nav:goto-file-with-menu-from-list
+   (rails-core:rspec-controllers)
+   "Go to controller spec."
+   'rails-core:rspec-controller-file))
+
+(defun rails-nav:goto-rspec-lib ()
+  "Go to lib specs."
+  (interactive)
+  (rails-nav:goto-file-with-menu-from-list
+   (rails-core:rspec-lib)
+   "Go to lib spec."
+   'rails-core:rspec-lib-file))
+
+(defun rails-nav:goto-rspec-models ()
+  "Go to model specs."
+  (interactive)
+  (rails-nav:goto-file-with-menu-from-list
+   (rails-core:rspec-models)
+   "Go to model spec."
+   'rails-core:rspec-model-file))
+
+(defun rails-nav:goto-rspec-views ()
+  "Go to view specs."
+  (interactive)
+  (rails-nav:goto-file-with-menu-from-list
+   (rails-core:rspec-views)
+   "Go to view spec."
+   'rails-core:rspec-view-file))
+
+(defun rails-nav:goto-rspec-fixtures ()
+  "Go to rspec fuxtures."
+  (interactive)
+  (rails-nav:goto-file-with-menu-from-list
+   (rails-core:rspec-fixtures)
+   "Go to rspec fixtures."
+   'rails-core:rspec-fixture-file))
+
 (defun rails-nav:create-new-layout (&optional name)
   "Create a new layout."
   (let ((name (or name (read-string "Layout name? "))))
