@@ -69,7 +69,7 @@ scroll-conservatively 10000)
 (desktop-save-mode 1)
 
 ;; 默认工作目录
-(setq default-directory "~/work")
+(setq default-directory "~/gitwork")
 
 ;;去掉工具栏
 (tool-bar-mode nil)
