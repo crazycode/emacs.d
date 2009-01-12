@@ -142,6 +142,11 @@ scroll-conservatively 10000)
 ;;(auto-revert-mode t)
 (global-auto-revert-mode)
 
+;;; Excellent package for better scrolling in emacs
+;;; should be default package. But now it can be downloaded
+;;; from: http://user.it.uu.se/~mic/pager.el
+(require 'pager)
+
 ;;加强c-x c-b (buffer list)的功能，用起来和目录差不多, 按 g 刷新
 (require 'ibuffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
@@ -160,3 +165,5 @@ scroll-conservatively 10000)
   (switch-to-buffer (nth (- (length (buffer-list)) 1) (buffer-list))))
 (global-set-key [C-tab] 'switch-to-previous-buffer)
 (global-set-key [C-S-tab] 'switch-to-next-buffer)
+
+
