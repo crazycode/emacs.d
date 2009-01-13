@@ -178,6 +178,7 @@ Emacs w3m browser."
     (:plugin           "vendor/plugins/")
     (:unit-test        "test/unit/")
     (:functional-test  "test/functional/")
+    (:integration-test  "test/integration/")
     (:fixture          "test/fixtures/")
     (:lib              "lib")
     (:rspec-controller "spec/controllers")
