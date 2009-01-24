@@ -1,14 +1,24 @@
-;;; weblogger.el - Weblog maintenance via XML-RPC APIs
 
-;; Copyright (C) 2002-2007 Mark A. Hershberger.
+;; weblogger.el - Weblog maintenance via XML-RPC APIs
+
+;; Copyright (C) 2002,2003,2004,2005 Mark A. Hershberger.
 ;; Inspired by code Copyright (C) 2001 by Simon Kittle.
-;; Parts Copyright (C) 2007 Wickersheimer Jeremy.
 
+;; Based on:
 ;; Author: Mark A. Hershberger <mah@everybody.org>
 ;; Version: 1.2
 ;; Created: 2002 Oct 11
 ;; Keywords: weblog blogger cms movable type openweblog blog
 ;; URL: http://elisp.info/package/weblogger/
+
+;; IMPORTANT:
+;;
+;; This file was patched by Wickersheimer Jeremy <jwickers@gmail.com>
+;; if you notice any bug with it don't complain to Mark A. Hershberger
+;;
+;; It requires the modified xml-rpc.el as well
+;;
+;; You can find the files and comment on http://jwickers.wordpress.com
 
 ;; This file is not yet part of GNU Emacs.
 
@@ -72,7 +82,7 @@
 ;;               (i.e. C-u C-x C-s) will prompt for which weblog
 ;;               to use.
 ;;
-;; C-c C-c    -- save as draft and bury the buffer.
+;; C-c C-c    -- does not publish, and also bury the buffer.
 ;;
 ;; C-c C-n    -- post (but not publish) the current entry and
 ;;               load the next entry.
@@ -566,11 +576,12 @@ available."
 			  (cdr (assoc "texttype" entry)))
 		    (list "Subject" title)
 		    (list "Keywords"
-                          (let ((cats (cdr (assoc "categories"  entry))))
-                            (when (> (length cats) 0)
-                              (mapconcat
-                               (lambda (p) p)
-                               cats ", "))))
+			  (let ((hold nil))
+			    (mapcar
+			     (lambda (p)
+			      (setq hold (if hold (concat hold ", " p) p) ))
+			     (cdr (assoc "categories"  entry)))
+			    (when hold hold)))
 		    (list "From"
 			  (or (cdr (assoc "authorName"  entry))
 			      weblogger-server-username))
@@ -599,13 +610,14 @@ for the weblog to use."
 
 
 (defun weblogger-save-entry (&optional publishp &optional arg)
-  "Publish the current entry is publishp is set.  With optional
-argument, prompts for the weblog to use."
+  "Publish the current entry is publishp is set.  With optional argument, prompts
+for the weblog to use."
   (interactive)
   (if (not (equal (current-buffer) *weblogger-entry*))
       (message 
        "You are not in the *weblogger-entry* buffer.")
     (let ((entry (weblogger-entry-buffer-to-struct)))
+      (message "%s" entry)
       (cond ((and (buffer-modified-p)
 		  (not (string-equal (cdr (assoc "content" entry)) "")))
 	     (weblogger-server-username arg)
@@ -914,7 +926,8 @@ is set, then add it to the current index and go to that entry."
   (if (ring-empty-p weblogger-entry-ring)
       (weblogger-api-list-entries weblogger-max-entries-in-ring))
   (weblogger-edit-entry
-   (ring-ref weblogger-entry-ring weblogger-ring-index)))
+   (ring-ref weblogger-entry-ring weblogger-ring-index))
+)
 
 (defun weblogger-next-entry ()
   "Edit the contents of the next entry."
@@ -975,9 +988,8 @@ specified, then the default is weblogger-max-entries-in-ring."
   (setq weblogger-category-list
 	(mapcar 
 	 (lambda (category)
-	   (ring-insert-at-beginning
-            weblogger-category-ring (cdr (assoc "categoryName"
-                                                category))))
+	   (ring-insert-at-beginning  weblogger-category-ring (cdr (assoc "categoryName" category)))
+	   )
 	 (xml-rpc-method-call
 	  weblogger-server-url
 	  'metaWeblog.getCategories
@@ -1035,7 +1047,8 @@ like."
 	(textType    (cdr (assoc-ignore-case "mt_convert_breaks" response)))
 	(url         (cdr (assoc-ignore-case "link" response)))
 	(description (assoc-ignore-case "description" response))
-	(categories  (cdr (assoc-ignore-case "categories" response))))
+	(categories  (cdr (assoc-ignore-case "categories" response)))
+	)
     
     (cond (content
 	   (delq nil (list
@@ -1099,7 +1112,10 @@ like."
 				    (cdr (assoc "texttype"    entry))))
 	 (cons "link"              (cdr (assoc "url"         entry)))
 	 (cons "description"       (cdr (assoc "content"     entry)))
-	 (cons "categories"        (cdr (assoc "categories"     entry))))))
+	 (cons "categories"        (cdr (assoc "categories"     entry)))
+	 )
+	)
+  )
 
 (defun weblogger-server-userid ()
   "Get information on user."
@@ -1149,16 +1165,13 @@ like."
 	(t
 	 (setq weblogger-api-new-entry 'weblogger-api-blogger-new-entry)))
   (cond ((cdr (assoc "metaWeblog.getCategories" weblogger-capabilities))
-	 (setq weblogger-api-list-categories
-               'weblogger-api-meta-list-categories))
+	 (setq weblogger-api-list-categories 'weblogger-api-meta-list-categories))
 	(t
-	 (setq weblogger-api-list-categories
-               'weblogger-api-blogger-list-categories)))
+	 (setq weblogger-api-list-categories 'weblogger-api-blogger-list-categories)))
   (cond ((cdr (assoc "metaWeblog.getRecentPosts" weblogger-capabilities))
 	 (setq weblogger-api-list-entries 'weblogger-api-meta-list-entries))
 	(t
-	 (setq weblogger-api-list-entries
-               'weblogger-api-blogger-list-entries))))
+	 (setq weblogger-api-list-entries 'weblogger-api-blogger-list-entries))))
 
 (defun weblogger-entry-buffer-to-struct (&optional encode buffer)
   "Convert an entry BUFFER to a struct (which is then used

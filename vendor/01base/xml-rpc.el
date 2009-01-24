@@ -2,17 +2,29 @@
 
 ;; Copyright (C) 2001 CodeFactory AB.
 ;; Copyright (C) 2001 Daniel Lundin.
+;; Parts Copyright (C) 2002-2005 Mark A. Hershberger
+
 ;; Copyright (C) 2006 Shun-ichi Goto
 ;;   Modified for non-ASCII character handling.
-;; Copyright (C) 2007 Wickersheimer Jeremy <jwickers@gmail.com>
-;; Copyright (C) 2002-2007 Mark A. Hershberger
 
+;; Base on:
 ;; Author: Daniel Lundin <daniel@codefactory.se>
 ;; Maintainer: Mark A. Hershberger <mah@everybody.org>
 ;; Version: 1.6.4
 ;; Created: May 13 2001
 ;; Keywords: xml rpc network
 ;; URL: http://elisp.info/package/xml-rpc/
+
+;; IMPORTANT:
+;;
+;; This file was patched by Wickersheimer Jeremy <jwickers@gmail.com>
+;; if you notice any bug with it don't complain to Daniel Lundin
+;;
+;; It is modified to work with the modified weblogger.el, it is not
+;; tested with any other package.
+;;
+;; You can find the files and comment on http://jwickers.wordpress.com
+
 
 ;; This file is NOT (yet) part of GNU Emacs.
 
@@ -63,7 +75,6 @@
 ;;       string:  "foo"
 ;;        array:  '(1 2 3 4)   '(1 2 3 (4.1 4.2))
 ;;       struct:  '(("name" . "daniel") ("height" . 6.1))
-;; struct with array values: '(:struct "name" "daniel" "john" "riek")
 
 
 ;; Examples
@@ -111,9 +122,6 @@
 
 
 ;;; History:
-
-;; 1.6.3   - Updated to handle vectors and ISO Dates
-;;           (Thanks Wickersheimer Jeremy <jwickers@gmail.com>!)
 
 ;; 1.6.2.2 - Modified to allow non-ASCII string again.
 ;;           It can handle non-ASCII page name and comment
@@ -230,9 +238,8 @@ Set it higher to get some info in the *Messages* buffer")
 (defun xml-rpc-caddar-safe (list)
   (car-safe (cdr-safe (cdr-safe (car-safe list)))))
 
-;; An XML-RPC struct is a list where every car is one one of:
-;; 1. a list of length 1 or 2 and has a string for car.
-;; 2. a list with the property :struct as a 1st member
+;; An XML-RPC struct is a list where every car is a list of length 1 or 2 and
+;; has a string for car.
 (defsubst xml-rpc-value-structp (value)
   "Return t if VALUE is an XML-RPC struct."
   (and (listp value)
@@ -242,9 +249,8 @@ Set it higher to get some info in the *Messages* buffer")
 	 (while (and vals result)
 	   (setq result (and
 			 (setq curval (car-safe vals))
-			 (or (and (listp curval) (symbolp (car curval)) (string= (car curval) :struct))
-			     (and (memq (safe-length curval) '(1 2))
-				  (stringp (car-safe curval))))))
+			 (memq (safe-length curval) '(1 2))
+			 (stringp (car-safe curval))))
 	   (setq vals (cdr-safe vals)))
 	 result)))
 
@@ -320,22 +326,21 @@ functions in xml.el."
     `((value nil (boolean nil ,(xml-rpc-boolean-to-string value)))))
    ;; might be a vector
    ((vectorp value)
-    (xml-rpc-value-to-xml-list (append value nil)))
+    (let ((myvec (append value nil)))
+      (xml-rpc-value-to-xml-list myvec)
+      )
+    )
    ((listp value)
     (let ((result nil)
 	  (xmlval nil))
       (if (xml-rpc-value-structp value)
 	  ;; Value is a struct
 	  (progn
-	    (while
-		(progn
-		  (when (and (symbolp (caar value)) (string= (caar value) :struct))
-		    (setq value (cons (cdar value) (cdr value))))
-		  (setq xmlval `((member nil (name nil ,(caar value))
-					 ,(car (xml-rpc-value-to-xml-list
-						(cdar value)))))
-			result (if t (append result xmlval) (car xmlval))
-			value (cdr value))))
+	    (while (setq xmlval `((member nil (name nil ,(caar value))
+					  ,(car (xml-rpc-value-to-xml-list
+						 (cdar value)))))
+			 result (if t (append result xmlval) (car xmlval))
+			 value (cdr value)))
 	    `((value nil ,(append '(struct nil) result))))
 	;; Value is an array
 	(while (setq xmlval (xml-rpc-value-to-xml-list (car value))
@@ -349,7 +354,7 @@ functions in xml.el."
    ;; Value is a Date ...
    ((xml-rpc-value-datep value)
     `((value nil (dateTime.iso8601 nil ,value))))
-   ;; Value is a String
+   ;; Value is a string
    ((xml-rpc-value-stringp value)
     (let ((charset-list (find-charset-string value)))
       (if (or xml-rpc-allow-unicode-string
@@ -357,6 +362,7 @@ functions in xml.el."
 		   (eq 'ascii (car charset-list)))
 	      (not xml-rpc-base64-encode-unicode))
 	  `((value nil (string nil ,(url-insert-entities-in-string value))))
+	 ; `((value nil (string nil ,(concat "<![CDATA[" value "]]>"))))
 	`((value nil (base64 nil ,(base64-encode-string
 				   (encode-coding-string value 'utf-8))))))))
    ((xml-rpc-value-doublep value)
