@@ -1,8 +1,8 @@
-;;; git-emacs (v.1.2) : yet another git emacs mode for newbies
+;;; git-emacs (v.1.3) : yet another git emacs mode for newbies
 ;;
 ;; Copyright (C) 2008  TSKim (tsgatesv@gmail.com)
 ;;
-;; v.1.2 Modified by Con Digitalpit @ 29 March 2008
+;; v.1.3 Modified by Con Digitalpit @ 29 March 2008
 ;; 
 ;; Authors    : TSKim : Kim Taesoo(tsgatesv@gmail.com)
 ;; Created    : 24 March 2007
@@ -45,7 +45,7 @@
 ;;   
 ;;; Installation
 ;; 
-;; (add-to-list 'load-path "/home/tsgates/Skills/git/git-emacs")
+;; (add-to-list 'load-path "~/.emacs.d/git-emacs")
 ;; (require 'git-emacs)
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -55,6 +55,7 @@
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
+;; TODO : check git environment
 ;; TODO : status -> index
 ;; TODO : pull/patch
 ;; TODO : delete temporary log file
@@ -72,12 +73,13 @@
 ;; TODO : locally flyspell
 ;; TODO : C-x v b -> branch
 ;; 
+;; DONE : turn off ido-mode globally
+;; DONE : git-add 
 
 (eval-when-compile (require 'cl))
 
 (require 'ewoc)                         ; view
 (require 'vc-git)                       ; vc-git advises
-(require 'ido)                          ; ido readline
 (require 'electric)                     ; branch mode
 (require 'time-stamp)                   ; today
 
@@ -88,9 +90,20 @@
 (defalias 'electric-command-loop  'Electric-command-loop)
 
 ;;-----------------------------------------------------------------------------
-;; prerequisite modes
+;; preference of ido-mode
 ;;-----------------------------------------------------------------------------
-(ido-mode t)                            ; need this line under Emacs 22.2 Ubuntu
+(defvar git--ido-completing-read
+  #'(lambda (prompt &rest args) (read-minibuffer prompt)))
+
+(defcustom git--use-ido t
+  "Turn ido globally or not"
+  :type '(boolean)
+  :group 'git-emacs)
+
+(when git--use-ido
+  (require 'ido)                        ; ido readline
+  (ido-mode t)
+  (setq git--ido-completing-read #'ido-completing-read))
 
 ;;-----------------------------------------------------------------------------
 ;; faces
@@ -179,11 +192,11 @@
   "Execute 'git' clumsily"
 
   (apply #'call-process
-         (concat "git-" cmd)            ; cmd
+         "git"                          ; cmd
          inbuf                          ; in buffer
          outbuf                         ; out buffer
          nil                            ; display
-         args))                         ; args
+         (cons cmd args)))              ; args
 
 (defun git--exec-pipe (cmd input &rest args)
   "Execute 'echo input | git cmd args' and return result string"
@@ -277,7 +290,7 @@
 (defsubst git--select-from-user (prompt choices)
   "Select from choices"
 
-  (ido-completing-read prompt choices))
+  (funcall git--ido-completing-read prompt choices))
 
 ;;-----------------------------------------------------------------------------
 ;; git execute command
@@ -327,7 +340,6 @@ and finally 'git--clone-sentinal' is called"
   "Execute 'git-rest' with 'args' and return the result as string"
   
   (apply #'git--exec-string "reset" args))
-
 
 (defsubst git--config (&rest args)
   "Execute git-config with args"
@@ -1583,9 +1595,9 @@ Trim the buffer log and commit"
         (message (git--commit (git--trim-string (buffer-substring begin end)) "-a")))))
 
   ;; close window
-  ;;(delete-window)
+  (delete-window)
   (kill-buffer git--commit-log-buffer)
-  (other-window 1)
+
   ;; update
   (git--update-modeline))
 
@@ -1711,6 +1723,9 @@ Trim the buffer log and commit"
       ;; flyspell-mode
       (when git--log-flyspell-mode (flyspell-mode t))
 
+      ;; comment hook
+      (run-hooks 'git-comment-hook)
+
       ;; hello~
       (message "Please 'C-cC-c' to commit"))
     (pop-to-buffer buffer)))
@@ -1755,12 +1770,14 @@ Trim the buffer log and commit"
   "Clone from repository"
   
   (interactive "DLocal Directory : ")
-  (let ((repository (ido-completing-read "Repository : "
-                                         git--repository-bookmarks
-                                         nil
-                                         nil
-                                         ""
-                                         git--repository-history)))
+  (let ((repository
+         (funcall git--ido-completing-read
+                  "Repository : "
+                  git--repository-bookmarks
+                  nil
+                  nil
+                  ""
+                  git--repository-history)))
     (with-temp-buffer
       (cd dir)
       (git--clone repository))))
@@ -1780,11 +1797,16 @@ Trim the buffer log and commit"
   ;; revert buffer
   (revert-buffer))
 
+(defcustom gitk-program "gitk"
+  "The command used to launch gitk."
+  :type '(string)
+  :group 'git-emacs)
+
 (defun gitk ()
   "Launch gitk in emacs"
 
   (interactive)
-  (start-process "gitk" nil "gitk"))
+  (start-process "gitk" nil gitk-program))
     
 (defun git-checkout (&optional rev)
   "Checkout from 'tag' & 'branch' list when 'rev' is null"
@@ -2007,6 +2029,15 @@ Trim the buffer log and commit"
   (interactive)
   (git--switch-branch (git--select-branch (git--current-branch)))
   (revert-buffer))
+
+(defun git-add ()
+  "Add new files to repository (usually one file, at least to me)"
+  
+  (interactive)
+  (git--select-from-user "Add new files (regex) >> "
+                         (mapcar #'(lambda (fi)
+                                     (git--fileinfo->name fi))
+                                 (git--ls-files "--others"))))
 
 ;;-----------------------------------------------------------------------------
 ;; branch mode
