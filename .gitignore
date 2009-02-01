@@ -4,5 +4,6 @@
 /backups
 *.elc
 /**/*.elc
+**/*.elc
 .svn
 tramp

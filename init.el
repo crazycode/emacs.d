@@ -6,5 +6,6 @@
 
 (my-add-subdirs-to-load-path "~/.emacs.d/vendor") 
 (mapc 'load (directory-files "~/.emacs.d/config/01base" t "\.el$")) 
+(mapc 'load (directory-files "~/.emacs.d/config/25jdee" t "\.el$")) 
 (mapc 'load (directory-files "~/.emacs.d/config/70emacsonrails" t "\.el$")) 
 (mapc 'load (directory-files "~/.emacs.d/config/99post" t "\.el$")) 
