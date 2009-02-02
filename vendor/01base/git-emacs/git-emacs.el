@@ -1595,8 +1595,9 @@ Trim the buffer log and commit"
         (message (git--commit (git--trim-string (buffer-substring begin end)) "-a")))))
 
   ;; close window
-  (delete-window)
+  ;;(delete-window)
   (kill-buffer git--commit-log-buffer)
+  (other-window 1)
 
   ;; update
   (git--update-modeline))
