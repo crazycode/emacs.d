@@ -123,6 +123,7 @@ scroll-conservatively 10000)
 
 ;;加入行号显示
 (require 'linum)
+(setq global-linum-mode t)
 
 ;;高亮当前行
 ;;(global-hl-line-mode 1)
