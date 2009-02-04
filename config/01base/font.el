@@ -1,5 +1,5 @@
 (if (>= emacs-major-version 23)
-    ((set-default-font "DejaVu Sans Mono-10")
+    (progn (set-frame-font "DejaVu Sans Mono-10")
      (set-fontset-font (frame-parameter nil 'font)
                        'unicode '("Microsoft YaHei" . "unicode-bmp")) 
      (set-fontset-font (frame-parameter nil 'font)
@@ -11,3 +11,16 @@
      (set-fontset-font (frame-parameter nil 'font)
                        'bopomofo '("Microsoft YaHei"  . "unicode-bmp")) 
      ))
+
+;; (set-frame-font "DejaVu Sans Mono-10")
+;; (set-fontset-font (frame-parameter nil 'font)
+;;                   'unicode '("Microsoft YaHei" . "unicode-bmp")) 
+;; (set-fontset-font (frame-parameter nil 'font)
+;;                   'han '("Microsoft YaHei" . "unicode-bmp"))
+;; (set-fontset-font (frame-parameter nil 'font)
+;;                   'symbol '("Microsoft YaHei"  . "unicode-bmp"))
+;; (set-fontset-font (frame-parameter nil 'font)
+;;                   'cjk-misc '("Microsoft YaHei"  . "unicode-bmp"))
+;; (set-fontset-font (frame-parameter nil 'font)
+;;                   'bopomofo '("Microsoft YaHei"  . "unicode-bmp")) 
+
