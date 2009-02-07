@@ -1,4 +1,4 @@
-(setq debug-on-error t)
+;;(setq debug-on-error t)
 
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/vendor/25jdee/jde/build/lisp"))
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/vendor/25jdee/cedet/common"))
