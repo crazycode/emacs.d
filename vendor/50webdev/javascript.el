@@ -1,11 +1,11 @@
 ;;; javascript.el --- Major mode for editing JavaScript source text
 
-;; Copyright (C) 2006 Karl Landström
+;; Copyright (C) 2008 Free Software Foundation, Inc.
 
-;; Author: Karl Landström <kland@comhem.se>
-;; Maintainer: Karl Landström <kland@comhem.se>
-;; Version: 2.0 Beta 8
-;; Date: 2006-12-26
+;; Author: Karl Landstrom <karl.landstrom@brgeight.se>
+;; Maintainer: Karl Landstrom <karl.landstrom@brgeight.se>
+;; Version: 2.2.1
+;; Date: 2008-12-27
 ;; Keywords: languages, oop
 
 ;; This file is free software; you can redistribute it and/or modify
@@ -70,6 +70,13 @@
   :type 'integer
   :group 'javascript)
 
+(defcustom javascript-expr-indent-offset 0
+  "Number of additional spaces used for indentation of continued
+expressions. The value must be no less than minus
+`javascript-indent-level'."
+  :type 'integer
+  :group 'javascript)
+
 (defcustom javascript-auto-indent-flag t
   "Automatic indentation with punctuation characters. If non-nil, the
 current line is indented when certain punctuations are inserted."
@@ -103,15 +110,17 @@ bound to KEY in the global keymap and indents the current line."
 (defvar javascript-mode-syntax-table
   (let ((table (make-syntax-table)))
     (c-populate-syntax-table table)
-
-    ;; The syntax class of underscore should really be `symbol' ("_")
-    ;; but that makes matching of tokens much more complex as e.g.
-    ;; "\\<xyz\\>" matches part of e.g. "_xyz" and "xyz_abc". Defines
-    ;; it as word constituent for now.
-    (modify-syntax-entry ?_ "w" table)
-
+    (modify-syntax-entry ?$ "_" table)
     table)
   "Syntax table used in JavaScript mode.")
+
+(defvar js-ident-as-word-syntax-table
+  (let ((table (copy-syntax-table javascript-mode-syntax-table)))
+    (modify-syntax-entry ?$ "w" table)
+    (modify-syntax-entry ?_ "w" table)
+    table)
+  "Alternative syntax table used internally to simplify detection
+  of identifiers and keywords and its boundaries.")
 
 
 (defun js-re-search-forward-inner (regexp &optional bound count)
@@ -164,7 +173,7 @@ comments have been removed."
       (re-search-backward regexp bound)
       (when (and (> (point) (point-min))
                  (save-excursion (backward-char) (looking-at "/[/*]")))
-        (forward-char))
+        (backward-char))
       (setq parse (parse-partial-sexp saved-point (point)))
       (cond ((nth 3 parse)
              (re-search-backward
@@ -198,18 +207,6 @@ comments have been removed."
        (goto-char saved-point)
        (unless noerror
          (error (error-message-string err)))))))
-
-
-(defun js-continued-var-decl-list-p ()
-  "Return non-nil if point is inside a continued variable declaration
-list."
-  (interactive)
-  (let ((start (save-excursion (js-re-search-backward "\\<var\\>" nil t))))
-    (and start
-	 (save-excursion (re-search-backward "\n" start t))
-	 (not (save-excursion 
-		(js-re-search-backward 
-		 ";\\|[^, \t][ \t]*\\(/[/*]\\|$\\)" start t))))))
 
 
 ;; --- Font Lock ---
@@ -261,8 +258,7 @@ list."
   (list 
    "\\<import\\>" 
    (list js-function-heading-1-re 1 font-lock-function-name-face)
-   (list js-function-heading-2-re 1 font-lock-function-name-face)
-   (list "[=(][ \t]*\\(/.*?[^\\]/\\w*\\)" 1 font-lock-string-face))
+   (list js-function-heading-2-re 1 font-lock-function-name-face))
   "Level one font lock.")
 
 (defconst js-font-lock-keywords-2
@@ -279,34 +275,27 @@ list."
 ;;
 ;;    var x, y = f(a, b), z
 ;;
-;; z will not be highlighted.
+;; z will not be highlighted. Also, in variable declaration lists
+;; spanning several lines only variables on the first line will be
+;; highlighted. To get correct fontification, every line with variable
+;; declarations must contain a `var' keyword.
 
 (defconst js-font-lock-keywords-3
   (append 
    js-font-lock-keywords-2
    (list 
-
+    
     ;; variable declarations
     (list
      (concat "\\<\\(const\\|var\\)\\>\\|" js-basic-type-re)
-     (list "\\(\\w+\\)[ \t]*\\([=;].*\\|,\\|/[/*]\\|$\\)"
+     (list "\\(\\w+\\)[ \t]*\\([=;].*\\|\\<in\\>.*\\|,\\|/[/*]\\|$\\)"
 	   nil
 	   nil
-	   '(1 font-lock-variable-name-face)))
-
-    ;; continued variable declaration list
-    (list
-     (concat "^[ \t]*\\w+[ \t]*\\([,;=]\\|/[/*]\\|$\\)")
-     (list "\\(\\w+\\)[ \t]*\\([=;].*\\|,\\|/[/*]\\|$\\)"
-	   '(if (save-excursion (backward-char) (js-continued-var-decl-list-p))
-		(backward-word 1) 
-	      (end-of-line))
-	   '(end-of-line)
 	   '(1 font-lock-variable-name-face)))
 
     ;; formal parameters
     (list
-     (concat "\\<function\\>\\([ \t]+\\w+\\)?[ \t]*([ \t]*\\w")
+     "\\<function\\>\\([ \t]+\\w+\\)?[ \t]*([ \t]*\\w"
      (list "\\(\\w+\\)\\([ \t]*).*\\)?"
 	   '(backward-char)
 	   '(end-of-line)
@@ -314,19 +303,25 @@ list."
     
     ;; continued formal parameter list
     (list
-     (concat "^[ \t]*\\w+[ \t]*[,)]")
+     "^[ \t]*\\w+[ \t]*[,)]"
      (list "\\w+"
 	   '(if (save-excursion (backward-char) (js-inside-param-list-p))
 		(backward-word 1) 
 	      (end-of-line))
 	   '(end-of-line)
-	   '(0 font-lock-variable-name-face)))))
+	   '(0 font-lock-variable-name-face)))
+))
   "Level three font lock.")
 
 (defconst js-font-lock-keywords
   '(js-font-lock-keywords-3 js-font-lock-keywords-1 js-font-lock-keywords-2
                             js-font-lock-keywords-3)
   "See `font-lock-keywords'.")
+
+(defconst js-font-lock-syntactic-keywords
+  '(("[=(][ \t\n]*\\(/\\)[^/*]\\(.*?[^\\]\\)?\\(/\\)" (1 '(7)) (3 '(7))))
+  "Highlighting of regular expressions. See also the variable
+  `font-lock-keywords'.")
 
 
 ;; --- Indentation ---
@@ -339,7 +334,7 @@ list."
   followed by an opening brace.")
 
 (defconst js-indent-operator-re
-  (concat "[-+*/%<>=&^|?:]\\([^-+*/]\\|$\\)\\|"
+  (concat "[-+*/%<>=&^|?:.]\\([^-+*/]\\|$\\)\\|"
           (regexp-opt '("in" "instanceof") 'words))
   "Regular expression matching operators that affect indentation
   of continued expressions.")
@@ -426,9 +421,6 @@ returns nil."
           (same-indent-p (looking-at "[]})]\\|\\<case\\>\\|\\<default\\>"))
           (continued-expr-p (js-continued-expression-p)))
       (cond (ctrl-stmt-indent)
-	    ((js-continued-var-decl-list-p)
-	     (js-re-search-backward "\\<var\\>" nil t)
-	     (+ (current-indentation) javascript-indent-level))
             ((nth 1 parse-status)
              (goto-char (nth 1 parse-status))
              (if (looking-at "[({[][ \t]*\\(/[/*]\\|$\\)")
@@ -439,27 +431,30 @@ returns nil."
                    (cond (same-indent-p
                           (current-column))
                          (continued-expr-p
-                          (+ (current-column) (* 2 javascript-indent-level)))
+                          (+ (current-column) (* 2 javascript-indent-level)
+                             javascript-expr-indent-offset))
                          (t
                           (+ (current-column) javascript-indent-level))))
                (unless same-indent-p
                  (forward-char)
                  (skip-chars-forward " \t"))
                (current-column)))
-	    (continued-expr-p javascript-indent-level)
+	    (continued-expr-p (+ javascript-indent-level 
+                                 javascript-expr-indent-offset))
             (t 0)))))
 
 
 (defun javascript-indent-line ()
   "Indent the current line as JavaScript source text."
   (interactive)
-  (let ((parse-status 
-         (save-excursion (parse-partial-sexp (point-min) (point-at-bol))))
-        (offset (- (current-column) (current-indentation))))
-    (when (not (nth 8 parse-status))
-      (indent-line-to (js-proper-indentation parse-status))
-      (when (> offset 0) (forward-char offset)))))
-
+  (with-syntax-table js-ident-as-word-syntax-table
+    (let ((parse-status 
+	   (save-excursion (parse-partial-sexp (point-min) (point-at-bol))))
+	  (offset (- (current-column) (current-indentation))))
+      (when (not (nth 8 parse-status))
+	(indent-line-to (js-proper-indentation parse-status))
+	(when (> offset 0) (forward-char offset))))))
+  
 
 ;; --- Filling ---
 
@@ -602,7 +597,7 @@ beginning of buffer to point. JUSTIFY has the same meaning as in
             (fill-paragraph justify))
 
           ;; In Emacs 21.4 as opposed to CVS Emacs 22,
-          ;; `fill-paragraph' seems toadd a newline at the end of the
+          ;; `fill-paragraph' seems to add a newline at the end of the
           ;; paragraph. Remove it!
           (goto-char (point-max))
           (when (looking-at "^$") (backward-delete-char 1))
@@ -656,7 +651,7 @@ Trailing comments are ignored."
   (list
    (list
     nil 
-    "function\\s-+\\(\\w+\\)\\s-*("
+    "function\\s-+\\(\\(\\w\\|\\s_\\)+\\)\\s-*("
     1))
   "Regular expression matching top level procedures. Used by imenu.")
 
@@ -676,13 +671,17 @@ Key bindings:
   (use-local-map javascript-mode-map)
   (set-syntax-table javascript-mode-syntax-table)
   (set (make-local-variable 'indent-line-function) 'javascript-indent-line)
-  (set (make-local-variable 'font-lock-defaults) (list js-font-lock-keywords))
+
+  (set (make-local-variable 'font-lock-defaults) 
+       (list js-font-lock-keywords 
+	     nil nil '((?$ . "w") (?_ . "w")) nil
+	     '(font-lock-syntactic-keywords . js-font-lock-syntactic-keywords)))
 
   (set (make-local-variable 'parse-sexp-ignore-comments) t) 
 
   ;; Comments
-  (setq comment-start "// ")
-  (setq comment-end "")
+  (set (make-local-variable 'comment-start) "// ")
+  (set (make-local-variable 'comment-end) "")
   (set (make-local-variable 'fill-paragraph-function) 
        'javascript-fill-paragraph)
 
