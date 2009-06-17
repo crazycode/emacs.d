@@ -268,7 +268,9 @@
        ("session" "session[:$${User}]" "session[...]")
        ("flash" "flash[:$${notice}] = '$${Successfully}'$." "flash[...]")) ; environment
     (0 "tests" rails-functional-test-minor-mode-abbrev-table rails-unit-test-minor-mode-abbrev-table rails-integration-test-minor-mode-abbrev-table
-       ("fix" "$${,rails-snippets-feature:fixture}(:$${one})$." "models(:name)")) ; functional tests
+       ("fix" "$${,rails-snippets-feature:fixture}(:$${one})$." "models(:name)")
+       ("rth" "require File.dirname(__FILE__) + '/../test_helper'" "require tst_helper")
+       ) ; functional tests
     (0 "shoulda" rails-functional-test-minor-mode-abbrev-table rails-unit-test-minor-mode-abbrev-table rails-integration-test-minor-mode-abbrev-table
        ("cont" "context \"$${description}\" do\n$>setup do\n$>$${setup}\nend$>\n\n$>should$.\nend$>" "context block with setup")
        ("should" "should \"$${description}\" do\n$>$.\nend$>" "should block")
