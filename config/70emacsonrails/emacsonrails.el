@@ -5,6 +5,11 @@
 (setq ri-ruby-script "~/.emacs.d/vendor/20language/ri-emacs/ri-emacs.rb")
 (autoload 'ri "ri-ruby" nil t)
 
+(add-hook 'javascript-mode-hook
+          (lambda()
+            (set (make-local-variable 'tab-width) 2)
+))
+
 (add-hook 'ruby-mode-hook  
           (lambda()  
             (add-hook 'local-write-file-hooks  

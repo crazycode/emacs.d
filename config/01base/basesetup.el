@@ -70,7 +70,7 @@ scroll-conservatively 10000)
 
 ;; 默认工作目录
 (if (>= emacs-major-version 23)
-    (setq default-directory "~/gitwork")
+    (setq default-directory "~/gitworks")
   (setq default-directory "~/work"))
 
 ;;去掉工具栏
