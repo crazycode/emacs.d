@@ -100,11 +100,7 @@ If the action is nil, return all views for the controller."
   "Make menu of view for CONTROLLER-NAME."
   (let (menu)
     (setq menu
-          (mapcar (lambda(i)
-                    (list (concat (if (string-match "^_" (file-name-nondirectory i)) "Partial" "View")
-                                  ": "
-                                  (file-name-nondirectory i))
-                          i))
+          (mapcar (lambda(i) (cons (file-name-nondirectory i) i))
                   (rails-controller-layout:view-files controller-name nil)))
     (when (zerop (length menu))
       (setq menu (list)))
@@ -174,7 +170,7 @@ If the action is nil, return all views for the controller."
               (progn
                 (find-file file)
                 (message (format "%s: %s" (substring (symbol-name type) 1) item)))
-            (message "File %s not exists" file)))
+            (message "File %s does not exist" file)))
       (message "%s not found" name))))
 
 (defun rails-controller-layout:switch-to-helper () (interactive) (rails-controller-layout:switch-to :helper))

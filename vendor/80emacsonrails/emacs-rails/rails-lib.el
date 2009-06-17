@@ -208,7 +208,7 @@ ABBREV-TABLE."
 not exist."
   `(progn
      (unless (boundp ',key-map)
-       (setf ,key-map (make-keymap)))
+       (setf ,key-map (make-sparse-keymap)))
      ,@(mapcar
   #'(lambda (key-func)
       `(define-key ,key-map ,(first key-func) ,(second key-func)))
@@ -392,7 +392,7 @@ as the value of the symbol, and the hook as the function definition."
 ;;       (setq mmm-indent-sandbox-finish-position nil)
 ;;       (save-excursion
 ;;         (set-buffer fragment-name)
-;;         (beginning-of-buffer)
+;;         (goto-char (point-min))
 ;;         (insert content)
 ;;         (goto-char fragment-pos)
 ;;         (funcall indent-func t)

@@ -101,6 +101,13 @@ otherwise if set REVERSE convert from remote to local."
                                                    command
                                                    command-args))
        (setq command rails-cmd-proxy:remote-cmd))
+     (save-excursion
+       (set-buffer (get-buffer-create buffer))
+       (set (make-local-variable 'comint-scroll-to-bottom-on-output) t)
+       (set (make-local-variable 'compilation-error-regexp-alist)
+	    rails-error-regexp-alist)
+       (compilation-shell-minor-mode t)
+       (rails-minor-mode t))
      (start-process-shell-command name
                                   buffer
                                   command

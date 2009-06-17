@@ -2,8 +2,8 @@
   "Minor mode for RubyOnRails models rspec."
   :lighter " ModelRSpec"
   :keymap (let ((map (rails-model-layout:keymap :rspec-model)))
-            (define-key map rails-minor-mode-test-current-method-key 'rails-rspec:run-current-method)
-            (define-key map [menu-bar rails-model-layout run] '("RSpec current method" . rails-rspec:run-current-method))
+            (define-key map rails-minor-mode-test-current-method-key 'rails-spec:run-this-spec)
+            (define-key map [menu-bar rails-model-layout run] '("RSpec current method" . rails-spec:run-this-spec))
             map)
   (setq rails-primary-switch-func (lambda()
                                     (interactive)

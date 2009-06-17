@@ -97,7 +97,7 @@
               (progn
                 (find-file file)
                 (message (format "%s: %s" (substring (symbol-name type) 1) item)))
-            (message "File %s not exists" file)))
+            (message "File %s does not exist" file)))
       (message "%s not found" name))))
 
 (defun rails-model-layout:switch-to-mailer () (interactive) (rails-model-layout:switch-to :mailer))

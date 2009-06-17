@@ -86,20 +86,26 @@ using `rails-default-environment'."
    (let ((proc (get-buffer-process rails-ws:buffer-name)))
      (if proc
          (message "Only one instance rails-ws allowed")
-       (let* ((default-directory root)
-              (env (if env env rails-default-environment))
-              (command (rails-ws:compute-server-conmmand rails-ws:default-server-type rails-ws:port env))
-              (proc
-               (rails-cmd-proxy:start-process-color rails-ruby-command
-                                              rails-ws:buffer-name
-                                              (car command)
-                                              (cadr command))))
+       (progn
+         (save-excursion
+           (set-buffer (get-buffer-create rails-ws:buffer-name))
+           (delete-region (point-min) (point-max)))
+	 (run-hooks 'rails-ws:before-start-hook)
+	 (let* ((default-directory root)
+		(env (if env env rails-default-environment))
+		(command (rails-ws:compute-server-conmmand rails-ws:default-server-type rails-ws:port env))
+		(proc
+		 (rails-cmd-proxy:start-process-color rails-ruby-command
+						rails-ws:buffer-name
+						(car command)
+						(cadr command))))
            (set-process-sentinel proc 'rails-ws:sentinel-proc)
            (setq rails-ws:process-environment env)
            (message (format "%s (%s) starting with port %s"
                             (capitalize rails-ws:default-server-type)
                             env
-                            rails-ws:port)))))))
+                            rails-ws:port)))
+	 (run-hooks 'rails-ws:after-start-hook))))))
 
 (defun rails-ws:compute-server-conmmand (server-type port env)
   (cond

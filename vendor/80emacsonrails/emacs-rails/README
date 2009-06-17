@@ -3,16 +3,21 @@ It is minor mode for editing "Ruby On Rails":ror code with
 friendly
 
 
-== Instalation
+== Installation
 
 You need download last release from RubyForge page
 "http://rubyforge.org/projects/emacs-rails" and and unpack
 it to directory containing libraries of Emacs, by default it's
 $HOME/.emacs.d/
 
-You can also use SVN
+Using Git:
 
-  cd  $HOME/.emacs.d/
+  cd $HOME/.emacs.d/
+  git clone git://github.com/tomtt/emacs-rails.git  
+
+Using SVN:
+
+  cd $HOME/.emacs.d/
   svn co svn://rubyforge/var/svn/emacs-rails/trunk emacs-rails
 
 Download and install required libraries
@@ -25,7 +30,7 @@ Download and install required libraries
 
 After that you must add this code in $HOME/.emacs
 
-  (setq load-path (cons "~/.emacs.d/rails" load-path))
+  (setq load-path (cons "~/.emacs.d/emacs-rails" load-path))
   (require 'rails)
 
 For Windows users: you can use your help in CHM format (the default

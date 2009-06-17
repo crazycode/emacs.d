@@ -1,3 +1,5 @@
+(require 'speedbar)
+
 (defvar rails-speedbar:roots
   '(("Controllers"      rails-core:controllers       rails-core:controller-file)
     ("Helpers"          rails-core:helpers           rails-core:helper-file)

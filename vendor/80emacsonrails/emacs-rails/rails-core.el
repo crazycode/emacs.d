@@ -28,20 +28,21 @@
 (eval-when-compile
   (require 'rails-lib))
 
-(defvar rails-core:class-dirs
+(defcustom rails-core:class-dirs
   '("app/controllers"
     "app/views"
     "app/models"
     "app/helpers"
     "test/unit"
     "test/functional"
-    "test/fixtures"
     "spec/controllers"
     "spec/fixtures"
     "spec/lib"
     "spec/models"
     "lib")
-  "Directories with Rails classes")
+  "Directories with Rails classes"
+  :group 'rails
+  :type '(repeat string))
 
 (defun rails-core:class-by-file (filename)
   "Return the class associated with FILENAME.
@@ -135,11 +136,11 @@ it does not exist, ask to create it using QUESTION as a prompt."
 (defun rails-core:controller-file (controller-name)
   "Return the path to the controller CONTROLLER-NAME."
   (when controller-name
-    (concat "app/controllers/"
-            (rails-core:file-by-class
-             (rails-core:short-controller-name controller-name) t)
-            (unless (string-equal controller-name "Application") "_controller")
-            ".rb")))
+    (let* ((basename (rails-core:file-by-class (rails-core:short-controller-name controller-name) t))
+	   (exact (concat "app/controllers/" basename ".rb")))
+      (if (file-exists-p (rails-core:file exact))
+	exact
+	(concat "app/controllers/" basename "_controller.rb")))))
 
 (defun rails-core:controller-exist-p (controller-name)
   "Return t if controller CONTROLLER-NAME exist."
@@ -624,6 +625,12 @@ If the action is nil, return all views for the controller."
     (when (search-backward-regexp "^[ ]*def \\([a-z0-9_]+\\)" nil t)
       (match-string-no-properties 1))))
 
+(defun rails-core:current-migration-version ()
+  "Return the current migration version"
+  (let ((name (buffer-file-name)))
+    (when (string-match "db\\/migrate\\/\\([0-9]+\\)[a-z0-9_]+\.[a-z]+$" name)
+      (match-string 1 name))))
+
 ;;;;;;;;;; Determination of buffer type ;;;;;;;;;;
 
 (defun rails-core:buffer-file-match (regexp)
@@ -688,13 +695,35 @@ the Rails minor mode log."
   (defun rails-core:menu-position ()
     (list '(300 50) (get-buffer-window (current-buffer)))))
 
+;; fixup emacs-rails menu specs to work with tmm-prompt
+(defun rails-core:tmm-menu (menu)
+  (symbol-name (tmm-prompt (cons (car menu)
+				 (mapcar (lambda (pane)
+					   (cons (car pane)
+						 (mapcar (lambda (item)
+							   (if (symbolp (cdr item))
+							       item
+							     (cons (car item)
+								   (intern (cdr item)))))
+							 (cdr pane))))
+					 (cdr menu))))))
+
+(defun rails-core:ido-menu (menu)
+  (let* ((prompt (car menu))
+         (mappings (cdr (car (cdr menu))))
+         (choices (delete-if #'not (mapcar (lambda (item) (car item)) mappings)))
+         (result (ido-completing-read prompt choices)))
+    (or (cdr (assoc result mappings)) result)))
+
 (defun rails-core:menu (menu)
   "Show a menu."
   (let ((result
          (if (rails-use-text-menu)
-             (tmm-prompt menu)
+           (funcall (or rails-text-menu-function
+                        (and (boundp 'ido-mode) ido-mode #'rails-core:ido-menu)
+                        #'rails-core:tmm-menu) menu)
            (x-popup-menu (rails-core:menu-position)
-                         (rails-core:prepare-menu  menu)))))
+                         (rails-core:prepare-menu menu)))))
     (if (listp result)
         (first result)
       result)))
@@ -752,7 +781,7 @@ the Rails minor mode log."
 
 (defun rails-core:rhtml-buffer-p ()
   "Return non nil if the current buffer is rhtml file."
-  (string-match "\\.html.erb$" (buffer-file-name)))
+  (string-match "\\.rhtml\\|\\.html\\.erb$" (buffer-file-name)))
 
 (defun rails-core:spec-exist-p ()
   "Return non nil if spec directory is exist."

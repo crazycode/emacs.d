@@ -51,6 +51,16 @@
 (require 'rails-compat)
 (require 'rails-project)
 
+
+;;;;;;;;; Defining custom group before loading other file
+
+(defgroup rails nil
+  "Edit Rails projet with Emacs."
+  :group 'programming
+  :prefix "rails-")
+
+;;;;;;;;; Loading most of the mode
+
 (require 'rails-core)
 (require 'rails-ruby)
 (require 'rails-lib)
@@ -73,11 +83,6 @@
 
 
 ;;;;;;;;;; Variable definition ;;;;;;;;;;
-
-(defgroup rails nil
-  "Edit Rails projet with Emacs."
-  :group 'programming
-  :prefix "rails-")
 
 (defcustom rails-api-root nil
   "*Root of Rails API html documentation. Must be a local directory."
@@ -112,6 +117,11 @@ Emacs w3m browser."
   "Force the use of text menus by default."
   :group 'rails
   :type 'boolean)
+
+(defcustom rails-text-menu-function nil
+  "Which function to use to create text menus. nil means #'rails-core:ttm-menu"
+  :group 'rails
+  :type 'string)
 
 (defcustom rails-ask-when-reload-tags nil
   "Indicates whether the user should confirm reload a TAGS table or not."
@@ -158,11 +168,16 @@ Emacs w3m browser."
   :type 'integer)
 
 (defvar rails-version "0.5.99.6")
-(defvar rails-templates-list '("html.erb" "erb" "js.rjs" "builder" "rhtml" "rxml" "rjs" "haml" "liquid" "mab" "rb" "js"))
+(defvar rails-templates-list '("html.erb" "erb" "js.rjs" "builder" "rhtml" "rxml" "rjs" "haml" "liquid" "mab"))
 (defvar rails-use-another-define-key nil)
 (defvar rails-primary-switch-func nil)
 (defvar rails-secondary-switch-func nil)
 (defvar rails-required-lisp-eval-depth 1000) ; Specifies the minimum required value of max-lisp-eval-depth for rails mode to work
+
+(defcustom rails-indent-and-complete t
+  "Key to indent and complete."
+  :group 'rails
+  :type 'boolean)
 
 (defvar rails-directory<-->types
   '((:controller       "app/controllers/")
@@ -188,8 +203,15 @@ Emacs w3m browser."
     (:migration        "db/migrate"))
   "Rails file types -- rails directories map")
 
-(defvar rails-enviroments '("development" "production" "test"))
-(defvar rails-default-environment (first rails-enviroments))
+(defcustom rails-environments '("development" "production" "test")
+  "rails environments"
+  :group 'rails
+  :type '(repeat string))
+
+(defcustom rails-default-environment (first rails-environments)
+  "rails environment used by default"
+  :group 'rails
+  :type 'string)
 
 (defvar rails-adapters-alist
   '(("mysql"      . sql-mysql)
@@ -197,8 +219,25 @@ Emacs w3m browser."
     ("sqlite3"    . sql-sqlite))
   "Sets emacs sql function for rails adapter names.")
 
-(defvar rails-tags-dirs '("app" "lib" "test" "db")
-  "List of directories from RAILS_ROOT where ctags works.")
+(defcustom rails-tags-dirs '("app" "lib" "test" "db")
+  "List of directories from RAILS_ROOT where ctags works."
+  :group 'rails
+  :type '(repeat string))
+
+(defvar rails-error-regexp-alist
+  '(
+    (" /?\\(app/[a-z0-9._/]*\\):\\([0-9]+\\)" 1 2)
+    (" /?\\(lib/[a-z0-9._/]*\\):\\([0-9]+\\)" 1 2)
+    (" /?\\(test/[a-z0-9._/]*\\):\\([0-9]+\\)" 1 2)
+    (" /?\\(db/[a-z0-9._/]*\\):\\([0-9]+\\)" 1 2)
+    (" /?\\(vendor/[a-z0-9._/]*\\):\\([0-9]+\\)" 1 2)
+    (" /?\\(app/[a-z0-9._/]*\\)" 1)
+    (" /?\\(lib/[a-z0-9._/]*\\)" 1)
+    (" /?\\(test/[a-z0-9._/]*\\)" 1)
+    (" /?\\(db/[a-z0-9._/]*\\)" 1)
+    (" /?\\(vendor/[a-z0-9._/]*\\)" 1)
+    )
+  "Rails specific compilation-error-regexp-alist.")
 
 (defun rails-use-text-menu ()
   "If t use text menu, popup menu otherwise"
@@ -211,9 +250,22 @@ Emacs w3m browser."
                            (svn-status root)))
 
 ;; helper functions/macros
+
+(defun backward-ruby-object ()
+  (if (looking-back "[-a-zA-Z_#:*]+" (line-beginning-position) t)
+      (goto-char (match-beginning 0))))
+
+(defun forward-ruby-object (n)
+  (if (> 0 n)
+      (when (search-backward-regexp "[^-a-zA-Z_#:*][-a-zA-Z_#:*]+" nil t (- n))
+	(forward-char)
+	(point))
+      (when (search-forward-regexp "[-a-zA-Z_#:*]+" nil t n)
+	(goto-char (match-end 0)))))
+
 (defun rails-search-doc (&optional item)
   (interactive)
-  (setq item (if item item (thing-at-point 'sexp)))
+  (setq item (if item item (thing-at-point 'ruby-object)))
   (unless item
     (setq item (read-string "Search symbol: ")))
   (if item
@@ -227,7 +279,7 @@ Emacs w3m browser."
           (setq buffer-read-only nil)
           (kill-region (point-min) (point-max))
           (message (concat "Please wait..."))
-          (call-process rails-ri-command nil "*ri*" t item)
+          (call-process rails-ri-command nil "*ri*" t "-T" "-f" "ansi" item)
 ;          (local-set-key [return] 'rails-search-doc) ; because this kicks in in text files. why? -mike
           (ansi-color-apply-on-region (point-min) (point-max))
           (setq buffer-read-only t)
@@ -288,7 +340,7 @@ Emacs w3m browser."
 
 (defun rails-read-enviroment-name (&optional default)
   "Read Rails enviroment with auto-completion."
-  (completing-read "Environment name: " (list->alist rails-enviroments) nil nil default))
+  (completing-read "Environment name: " (list->alist rails-environments) nil nil default))
 
 (defun* rails-run-sql (&optional env)
   "Run a SQL process for the current Rails project."
@@ -422,9 +474,10 @@ necessary."
             (modify-syntax-entry ?: "w" (syntax-table))
             (modify-syntax-entry ?_ "w" (syntax-table))
             ;(local-set-key (kbd "C-.") 'complete-tag)
-            (local-set-key (if rails-use-another-define-key
-                               (kbd "TAB") (kbd "<tab>"))
-                           'indent-and-complete)
+	    (if rails-indent-and-complete
+		(local-set-key (if rails-use-another-define-key
+				   (kbd "TAB") (kbd "<tab>"))
+			       'indent-and-complete))
             (local-set-key (rails-key "f") '(lambda()
                                               (interactive)
                                               (mouse-major-mode-menu (rails-core:menu-position))))
@@ -442,9 +495,10 @@ necessary."
             (rails-project:with-root
              (root)
              (progn
-               (local-set-key (if rails-use-another-define-key
-                                  (kbd "TAB") (kbd "<tab>"))
-                              'indent-and-complete)
+	       (if rails-indent-and-complete
+		   (local-set-key (if rails-use-another-define-key
+				      (kbd "TAB") (kbd "<tab>"))
+				  'indent-and-complete))
                (rails-minor-mode t)
                (rails-apply-for-buffer-type)))))
 
@@ -463,7 +517,6 @@ necessary."
 (setq auto-mode-alist  (cons '("\\.mab$"     . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist  (cons '("Rakefile$"   . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist  (cons '("\\.haml$"    . haml-mode) auto-mode-alist))
-(setq auto-mode-alist  (cons '("\\.rjs$"     . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist  (cons '("\\.rxml$"    . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist  (cons '("\\.builder$" . ruby-mode) auto-mode-alist))
 (setq auto-mode-alist  (cons '("\\.rjs$"     . ruby-mode) auto-mode-alist))

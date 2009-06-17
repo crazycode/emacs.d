@@ -138,6 +138,13 @@ For example -c to remove files from svn.")
 (defun rails-script:running-p ()
   (get-buffer-process rails-script:buffer-name))
 
+(defun rails-script:kill-script ()
+  "Kill the currently running rails script"
+  (interactive)
+  (let ((proc (rails-script:running-p)))
+    (if proc
+	(delete-process proc))))
+
 (defun rails-script:sentinel-proc (proc msg)
   (let* ((name rails-script:running-script-name)
          (ret-val (process-exit-status proc))
@@ -152,7 +159,7 @@ For example -c to remove files from svn.")
     (with-current-buffer buf
       (run-hooks 'rails-script:run-after-stop-hook))))
 
-(defun rails-script:run (command parameters &optional buffer-major-mode)
+(defun rails-script:run (command parameters &optional buffer-major-mode mode-line-string)
   "Run a Rails script COMMAND with PARAMETERS with
 BUFFER-MAJOR-MODE and process-sentinel SENTINEL."
   (unless (listp parameters)
@@ -182,6 +189,8 @@ BUFFER-MAJOR-MODE and process-sentinel SENTINEL."
                (if (= 1 (length parameters))
                    (format "%s %s" command (first parameters))
                  (format "%s %s" (first parameters) (first (cdr parameters)))))
+	 (setq rails-ui:mode-line-script-name (or mode-line-string
+						  command))
          (message "Starting %s." rails-script:running-script-name))))))
 
 ;;;;;;;;;; Destroy stuff ;;;;;;;;;;
@@ -313,12 +322,19 @@ BUFFER-MAJOR-MODE and process-sentinel SENTINEL."
      (setq ruby-buffer buffer-name))
    (rails-minor-mode t)))
 
-(defun rails-script:console ()
-  "Run script/console."
-  (interactive)
-  (rails-script:run-interactive (format "console at (%s)" rails-default-environment)
-                                "script/console"
-                                 rails-default-environment))
+(defun rails-script:console (&optional environment)
+  "Run script/console. With prefix arg, prompts for environment."
+  (interactive (list
+                (and current-prefix-arg
+                     (read-buffer "Environment: " rails-default-environment))))
+  (let* ((environment (or environment rails-default-environment))
+         (name (format "console at (%s)" environment))
+	 (buffer (get-buffer (format "*rails-%s-%s*" (rails-project:name) name))))
+    (if buffer
+	(switch-to-buffer-other-window buffer)
+	(rails-script:run-interactive name
+				      "script/console"
+				      environment))))
 
 (defun rails-script:breakpointer ()
   "Run script/breakpointer."
@@ -326,3 +342,4 @@ BUFFER-MAJOR-MODE and process-sentinel SENTINEL."
   (rails-script:run-interactive "breakpointer" "script/breakpointer"))
 
 (provide 'rails-scripts)
+

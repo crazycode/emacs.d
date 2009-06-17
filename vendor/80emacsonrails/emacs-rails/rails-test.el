@@ -26,7 +26,15 @@
 
 ;;; Code:
 
+
+(defcustom rails-test:quiet 't
+  "Do not show test progress in minibuffer."
+  :group 'rails
+  :type 'boolean
+  :tag "Rails Quiet Tests")
+
 (defvar rails-test:history nil)
+
 
 (defconst rails-test:result-regexp
   "\\([0-9]+ tests, [0-9]+ assertions, \\([0-9]+\\) failures, \\([0-9]+\\) errors\\)")
@@ -86,13 +94,22 @@
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward "^Started" end t)
-        (line-move 1)
-        (save-match-data
-          (let ((progress (string=~ rails-test:progress-regexp
-                                    (current-line-string) $m)))
-            (when progress
-              (setq content (concat content progress)))))))
-    (when content
+	(line-move 1)
+	(save-match-data
+	  (let ((progress (string=~ rails-test:progress-regexp
+				    (current-line-string) $m)))
+	    (when progress
+	      (setq content (concat content progress))
+	      (setq rails-ui:num-errors 0
+		    rails-ui:num-failures 0
+		    rails-ui:num-ok 0)
+	      (dolist (c (string-to-list content))
+		(case c
+		  (?\E (setq rails-ui:num-errors (+ 1 rails-ui:num-errors)))
+		  (?\F (setq rails-ui:num-failures (+ 1 rails-ui:num-failures)))
+		  (?\. (setq rails-ui:num-ok (+ 1 rails-ui:num-ok))))))))))
+    (when (and content  
+	       (not rails-test:quiet))
       (message "Progress of %s: %s" rails-script:running-script-name content))))
 
 (define-derived-mode rails-test:compilation-mode compilation-mode "RTest"
@@ -124,7 +141,7 @@
 As the buffer is read-only this is merely a change in appearance"
   (rails-project:with-root (root)
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (let ((file-regex (concat (regexp-quote root) "[^:]+")))
         (while (re-search-forward file-regex nil t)
           (let* ((orig-filename (match-string 0))
@@ -155,6 +172,7 @@ Used when it's determined that the output buffer needs to be shown."
   (interactive (rails-completing-read "What test run"
                                       (rails-test:list-of-tasks)
                                       'rails-test:history t))
+  (rails-ui:reset-error-count)
   (unless task
     (setq task "all")
     (add-to-list rails-test:history task))
@@ -162,16 +180,31 @@ Used when it's determined that the output buffer needs to be shown."
          (if (string= "all" task)
              "test"
            (concat "test:" task))))
-    (rails-rake:task task-name 'rails-test:compilation-mode)))
+    (rails-rake:task task-name 'rails-test:compilation-mode (concat "test " task))))
+
+(defvar rails-test:previous-run-single-param nil
+  "Hold params of previous run-single-file call.")
 
 (defun rails-test:run-single-file (file &optional param)
   "Run test for single file FILE."
   (when (not (or file param))
     "Refuse to run ruby without an argument: it would never return")
+  (rails-ui:reset-error-count)
   (let ((param (if param
                    (list file param)
-                 (list file))))
-    (rails-script:run "ruby" param 'rails-test:compilation-mode)))
+                 (list file)))
+	(test-name file))
+    (if (string-match "\\([^/\\\\.]+\\)_test\.rb$" test-name)
+	(setq test-name (concat "test " (match-string-no-properties 1 test-name))))
+    (rails-script:run "ruby" (append (list "-Itest") param) 'rails-test:compilation-mode test-name)
+    (setq rails-test:previous-run-single-param param)))
+
+(defun rails-test:rerun-single ()
+  "Rerun previous single file test."
+  (interactive)
+  (if rails-test:previous-run-single-param
+    (apply 'rails-test:run-single-file rails-test:previous-run-single-param)
+    (message "No previous single file test recorded.")))
 
 (defun rails-test:run-current ()
   "Run a test for the current controller/model/mailer."
@@ -196,16 +229,22 @@ Used when it's determined that the output buffer needs to be shown."
              (buffer-file-name)
            (error "Cannot determine whiche test file to run.")))))))
 
+(defun rails-test:active-support-test-case-current-test ()
+  (save-excursion
+    (ruby-end-of-block)
+    (and (search-backward-regexp "^[ ]*test \"\\([a-z0-9_ ]+\\)\"[ ]*do" nil t)
+         (match-string-no-properties 1))))
+
 (defun rails-test:run-current-method ()
   "Run a test for the current method."
   (interactive)
   (let ((file (substring (buffer-file-name) (length (rails-project:root))))
         (method (rails-core:current-method-name))
-        (shoulda-method (rails-shoulda:current-test)))
-    (when method
-      (rails-test:run-single-file file (format "--name=%s" method)))
-    (when shoulda-method
-      (rails-test:run-single-file file (format "--name=/%s/" (replace-regexp-in-string "[\+\. \'\"\(\)]" "." shoulda-method))))))
+        (description (or (rails-test:active-support-test-case-current-test) (rails-shoulda:current-test))))
+    (cond (description
+           (rails-test:run-single-file file (format "--name=/%s/" (replace-regexp-in-string "[\+\. \'\"\(\)]" "." description))))
+          (method
+           (rails-test:run-single-file file (format "--name=%s" method))))))
 
 ;; These functions were originally defined anonymously in ui. They are defined here so keys
 ;; can be added to them dryly

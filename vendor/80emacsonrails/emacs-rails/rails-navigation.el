@@ -68,7 +68,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:controllers t)
-   "Go to controller"
+   "Go to controller.."
    'rails-core:controller-file))
 
 (defun rails-nav:goto-models ()
@@ -84,7 +84,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:functional-tests)
-   "Go to functional test."
+   "Go to functional test.."
    'rails-core:functional-test-file))
 
 (defun rails-nav:goto-unit-tests ()
@@ -92,7 +92,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:unit-tests)
-   "Go to unit test."
+   "Go to unit test.."
    'rails-core:unit-test-file))
 
 (defun rails-nav:goto-observers ()
@@ -141,7 +141,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:rspec-controllers)
-   "Go to controller spec."
+   "Go to controller spec.."
    'rails-core:rspec-controller-file))
 
 (defun rails-nav:goto-rspec-lib ()
@@ -149,7 +149,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:rspec-lib)
-   "Go to lib spec."
+   "Go to lib spec.."
    'rails-core:rspec-lib-file))
 
 (defun rails-nav:goto-rspec-models ()
@@ -157,7 +157,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:rspec-models)
-   "Go to model spec."
+   "Go to model spec.."
    'rails-core:rspec-model-file))
 
 (defun rails-nav:goto-rspec-views ()
@@ -165,7 +165,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:rspec-views)
-   "Go to view spec."
+   "Go to view spec.."
    'rails-core:rspec-view-file))
 
 (defun rails-nav:goto-rspec-fixtures ()
@@ -173,7 +173,7 @@
   (interactive)
   (rails-nav:goto-file-with-menu-from-list
    (rails-core:rspec-fixtures)
-   "Go to rspec fixtures."
+   "Go to rspec fixtures.."
    'rails-core:rspec-fixture-file))
 
 (defun rails-nav:create-new-layout (&optional name)
@@ -268,8 +268,11 @@ Rules for actions/controllers:
     rails-line-->controller+action
     rails-line-->layout
     rails-line-->stylesheet
-    rails-line-->js)
-  "Functions that will ne called to analyze the line when
+    rails-line-->js
+    rails-line-->association-model
+    rails-line-->single-association-model
+    rails-line-->multi-association-model)
+  "Functions that will be called to analyze the line when
 rails-goto-file-on-current-line is run.")
 
 (def-goto-line rails-line-->stylesheet (("[ ]*stylesheet_link_tag[ ][\"']\\([^\"']*\\)[\"']"
@@ -301,6 +304,17 @@ rails-goto-file-on-current-line is run.")
   (rails-core:find-or-ask-to-create
    (format "JavaScript file \"%s\" does not exist do you whant to create it? " name)
    (rails-core:js-file name)))
+
+(def-goto-line rails-line-->association-model (("^[ \t]*\\(has_one\\|belongs_to\\|has_many\\|has_and_belongs_to_many\\)[ \t].*:class_name[ \t]*=>[ \t]*[\"']\\([^\"']*\\)[\"']"
+                                                (name 2)))
+  (rails-core:find-file (rails-core:model-file name)))
+
+(def-goto-line rails-line-->single-association-model (("^[ \t]*\\(has_one\\|belongs_to\\)[ \t]*:\\([a-z0-9_]*\\)" (name 2)))
+  (rails-core:find-file (rails-core:model-file name)))
+
+(def-goto-line rails-line-->multi-association-model (("^[ \t]*\\(has_many\\|has_and_belongs_to_many\\)[ \t]*:\\([a-z0-9_]*\\)" (name 2)))
+  (message (singularize-string name))
+  (rails-core:find-file (rails-core:model-file (singularize-string name))))
 
 (defvar rails-line-to-controller/action-keywords
   '("render" "redirect_to" "link_to" "form_tag" "start_form_tag" "render_component"
