@@ -1,3 +1,20 @@
+;; 设置字体的函数
+;;(defun my-default-font ()
+;;  (interactive)
+  (set-default-font "Yahei Consolas Hybrid-11")
+  (set-fontset-font (frame-parameter nil 'font)
+                    'han '("Yahei Consolas Hybrid"."unicode-bmp"))
+;;)
+
+;; 有关界面和字体的配置
+;; (add-hook 'after-make-frame-functions
+;;           (lambda (new-frame)
+;;             (select-frame new-frame)
+;;             (tool-bar-mode 0)
+;;             (scroll-bar-mode 0)
+;;             (my-default-font)
+;; ))
+
 ;; (if (>= emacs-major-version 23)
 ;;     (progn (set-frame-font "DejaVu Sans Mono-10")
 ;;      (set-fontset-font (frame-parameter nil 'font)
