@@ -1,6 +1,6 @@
 
-;;;### (autoloads (bsh-script-help) "beanshell" "beanshell.el" (18821
-;;;;;;  46869))
+;;;### (autoloads (bsh-script-help) "beanshell" "beanshell.el" (19058
+;;;;;;  47045))
 ;;; Generated autoloads from beanshell.el
 
 (autoload 'bsh-script-help "beanshell" "\
@@ -11,7 +11,7 @@ Display BeanShell User's Guide.
 ;;;***
 
 ;;;### (autoloads (jde-ant-show-options jde-ant-projecthelp jde-ant-build)
-;;;;;;  "jde-ant" "jde-ant.el" (18821 46869))
+;;;;;;  "jde-ant" "jde-ant.el" (19058 47045))
 ;;; Generated autoloads from jde-ant.el
 
 (autoload 'jde-ant-build "jde-ant" "\
@@ -35,8 +35,8 @@ Show the JDE Ant Options panel.
 
 ;;;***
 
-;;;### (autoloads (jde-bug-debug-app) "jde-bug" "jde-bug.el" (18821
-;;;;;;  46869))
+;;;### (autoloads (jde-bug-debug-app) "jde-bug" "jde-bug.el" (19058
+;;;;;;  47045))
 ;;; Generated autoloads from jde-bug.el
 
 (autoload 'jde-bug-debug-app "jde-bug" "\
@@ -47,7 +47,7 @@ Runs the debugger on the application in the current source buffer.
 ;;;***
 
 ;;;### (autoloads (jde-checkstyle jde-checkstyle-customize) "jde-checkstyle"
-;;;;;;  "jde-checkstyle.el" (18821 46869))
+;;;;;;  "jde-checkstyle.el" (19058 47045))
 ;;; Generated autoloads from jde-checkstyle.el
 
 (autoload 'jde-checkstyle-customize "jde-checkstyle" "\
@@ -68,7 +68,7 @@ history enabled.
 
 ;;;***
 
-;;;### (autoloads nil "jde-compat" "jde-compat.el" (18821 46869))
+;;;### (autoloads nil "jde-compat" "jde-compat.el" (19058 47045))
 ;;; Generated autoloads from jde-compat.el
 
 (defconst jde-xemacsp (string-match "XEmacs" (emacs-version)) "\
@@ -77,7 +77,7 @@ Non-nil if we are running in the XEmacs environment.")
 ;;;***
 
 ;;;### (autoloads (jde-compile jde-set-compile-options) "jde-compile"
-;;;;;;  "jde-compile.el" (18821 46869))
+;;;;;;  "jde-compile.el" (19058 47045))
 ;;; Generated autoloads from jde-compile.el
 
 (autoload 'jde-set-compile-options "jde-compile" "\
@@ -104,7 +104,7 @@ uses the compiler executable specified by
 ;;;***
 
 ;;;### (autoloads (jde-customize-option) "jde-custom" "jde-custom.el"
-;;;;;;  (18821 46869))
+;;;;;;  (19058 47045))
 ;;; Generated autoloads from jde-custom.el
 
 (defalias 'jde-customize-variable 'jde-customize-option)
@@ -118,7 +118,7 @@ Customize SYMBOL, which must be a JDEE option variable.
 
 ;;;### (autoloads (jde-debug-applet jde-debug jde-db-set-app-args
 ;;;;;;  jde-db-set-args jde-db-set-debugger) "jde-db" "jde-db.el"
-;;;;;;  (18821 46869))
+;;;;;;  (19058 47045))
 ;;; Generated autoloads from jde-db.el
 
 (autoload 'jde-db-set-debugger "jde-db" "\
@@ -166,7 +166,7 @@ file in the current buffer.
 ;;;***
 
 ;;;### (autoloads (jde-ejb-entity-bean-buffer jde-ejb-session-bean-buffer)
-;;;;;;  "jde-ejb" "jde-ejb.el" (18821 46869))
+;;;;;;  "jde-ejb" "jde-ejb.el" (19058 47045))
 ;;; Generated autoloads from jde-ejb.el
 
 (autoload 'jde-ejb-session-bean-buffer "jde-ejb" "\
@@ -195,7 +195,7 @@ to the EJB naming convention.
 ;;;;;;  jde-gen-equals-method-template jde-gen-equals-parens-around-expression
 ;;;;;;  jde-gen-equals-trailing-and-operators jde-gen-buffer jde-gen-jfc-app-buffer
 ;;;;;;  jde-gen-bean-buffer jde-gen-console-buffer jde-gen-interface-buffer
-;;;;;;  jde-gen-class-buffer) "jde-gen" "jde-gen.el" (18821 46869))
+;;;;;;  jde-gen-class-buffer) "jde-gen" "jde-gen.el" (19058 47045))
 ;;; Generated autoloads from jde-gen.el
 
 (autoload 'jde-gen-class-buffer "jde-gen" "\
@@ -379,7 +379,7 @@ It then moves the point to the location of the first method.
 ;;;***
 
 ;;;### (autoloads (jde-help-browse-jdk-doc jde-help-beanshell) "jde-help"
-;;;;;;  "jde-help.el" (18821 46869))
+;;;;;;  "jde-help.el" (19058 47045))
 ;;; Generated autoloads from jde-help.el
 
 (autoload 'jde-help-beanshell "jde-help" "\
@@ -396,7 +396,7 @@ stored in the variable jde-jdk-doc-url to locate the JDK documentation.
 ;;;***
 
 ;;;### (autoloads (jde-import-organize) "jde-import" "jde-import.el"
-;;;;;;  (18821 46869))
+;;;;;;  (19058 47045))
 ;;; Generated autoloads from jde-import.el
 
 (autoload 'jde-import-organize "jde-import" "\
@@ -423,7 +423,7 @@ version of the JDE with the semantic parser.
 ;;;***
 
 ;;;### (autoloads (jde-java-font-lock-setup-keywords) "jde-java-font-lock"
-;;;;;;  "jde-java-font-lock.el" (18821 46869))
+;;;;;;  "jde-java-font-lock.el" (19058 47045))
 ;;; Generated autoloads from jde-java-font-lock.el
 
 (autoload 'jde-java-font-lock-setup-keywords "jde-java-font-lock" "\
@@ -436,7 +436,7 @@ expressions.
 ;;;***
 
 ;;;### (autoloads (jde-javadoc-make-buffer jde-javadoc-make jde-javadoc-make-internal)
-;;;;;;  "jde-javadoc-gen" "jde-javadoc-gen.el" (18821 46869))
+;;;;;;  "jde-javadoc-gen" "jde-javadoc-gen.el" (19058 47045))
 ;;; Generated autoloads from jde-javadoc-gen.el
 
 (autoload 'jde-javadoc-make-internal "jde-javadoc-gen" "\
@@ -497,7 +497,7 @@ browser.
 ;;;;;;  jde-javadoc-checkdoc-at-line jde-javadoc-remdoc-at-line jde-javadoc-autodoc-at-line
 ;;;;;;  jde-javadoc-customize jde-javadoc-checker-quit jde-javadoc-checker-fix
 ;;;;;;  jde-javadoc-checker-next jde-javadoc-checker-previous) "jde-javadoc"
-;;;;;;  "jde-javadoc.el" (18821 46869))
+;;;;;;  "jde-javadoc.el" (19058 47045))
 ;;; Generated autoloads from jde-javadoc.el
 
 (autoload 'jde-javadoc-checker-previous "jde-javadoc" "\
@@ -665,7 +665,7 @@ definition.
 
 ;;;### (autoloads (jde-junit-show-options jde-junit-run jde-junit-add-test-to-suite
 ;;;;;;  jde-junit-test-class-buffer jde-junit-test-class) "jde-junit"
-;;;;;;  "jde-junit.el" (18821 46869))
+;;;;;;  "jde-junit.el" (19058 47045))
 ;;; Generated autoloads from jde-junit.el
 
 (autoload 'jde-junit-test-class "jde-junit" "\
@@ -702,7 +702,7 @@ Show the JDE JUnit Options panel.
 ;;;***
 
 ;;;### (autoloads (jde-make-show-options jde-make) "jde-make" "jde-make.el"
-;;;;;;  (18821 46869))
+;;;;;;  (19058 47045))
 ;;; Generated autoloads from jde-make.el
 
 (autoload 'jde-make "jde-make" "\
@@ -723,7 +723,7 @@ Show the JDE Make Options panel.
 ;;;***
 
 ;;;### (autoloads (jde-package-update) "jde-package" "jde-package.el"
-;;;;;;  (18821 46869))
+;;;;;;  (19058 47045))
 ;;; Generated autoloads from jde-package.el
 
 (autoload 'jde-package-update "jde-package" "\
@@ -740,7 +740,7 @@ this command does nothing. This command signals an error if the
 ;;;***
 
 ;;;### (autoloads (jde-create-new-project jde-save-project jde-open-project-file)
-;;;;;;  "jde-project-file" "jde-project-file.el" (18821 46869))
+;;;;;;  "jde-project-file" "jde-project-file.el" (19058 47045))
 ;;; Generated autoloads from jde-project-file.el
 
 (autoload 'jde-open-project-file "jde-project-file" "\
@@ -776,7 +776,7 @@ hierarchical projects.
 
 ;;;### (autoloads (jde-run-applet jde-run jde-run-set-applet-doc
 ;;;;;;  jde-run-set-applet-viewer jde-run-set-app-args jde-run-set-args
-;;;;;;  jde-run-set-app) "jde-run" "jde-run.el" (18821 46869))
+;;;;;;  jde-run-set-app) "jde-run" "jde-run.el" (19058 47045))
 ;;; Generated autoloads from jde-run.el
 
 (autoload 'jde-run-set-app "jde-run" "\
@@ -850,7 +850,7 @@ file.
 ;;;***
 
 ;;;### (autoloads (jde-stat-loc-report-directory jde-stat-loc-report-project
-;;;;;;  jde-stat-loc-report) "jde-stat" "jde-stat.el" (18821 46869))
+;;;;;;  jde-stat-loc-report) "jde-stat" "jde-stat.el" (19058 47045))
 ;;; Generated autoloads from jde-stat.el
 
 (autoload 'jde-stat-loc-report "jde-stat" "\
@@ -879,7 +879,7 @@ contained in dir.
 
 ;;;***
 
-;;;### (autoloads (jde-require) "jde-util" "jde-util.el" (18821 46869))
+;;;### (autoloads (jde-require) "jde-util" "jde-util.el" (19058 47045))
 ;;; Generated autoloads from jde-util.el
 
 (autoload 'jde-require "jde-util" "\
@@ -893,7 +893,7 @@ Require FEATURE, either pre-installed or from the distribution.
 ;;;***
 
 ;;;### (autoloads (jde-which-method-mode) "jde-which-method" "jde-which-method.el"
-;;;;;;  (18821 46869))
+;;;;;;  (19058 47045))
 ;;; Generated autoloads from jde-which-method.el
 
 (defvar jde-which-method-mode t "\
@@ -906,7 +906,7 @@ displayed in the mode line.")
 ;;;***
 
 ;;;### (autoloads (jde-xemacs-insert-toolbar) "jde-xemacs" "jde-xemacs.el"
-;;;;;;  (18821 46869))
+;;;;;;  (19058 47045))
 ;;; Generated autoloads from jde-xemacs.el
 
 (autoload 'jde-xemacs-insert-toolbar "jde-xemacs" "\
@@ -918,7 +918,7 @@ Insert or remove JDE toolbar in the XEmacs toolbar.
 
 ;;;### (autoloads (jde-xref-customize jde-xref-update jde-xref-list-uncalled-functions
 ;;;;;;  jde-xref-display-call-tree jde-xref-next-caller jde-xref-first-caller
-;;;;;;  jde-xref-make-xref-db) "jde-xref" "jde-xref.el" (18821 46869))
+;;;;;;  jde-xref-make-xref-db) "jde-xref" "jde-xref.el" (19058 47045))
 ;;; Generated autoloads from jde-xref.el
 
 (autoload 'jde-xref-make-xref-db "jde-xref" "\
@@ -985,8 +985,8 @@ Display the customization buffer for the xref package.
 ;;;***
 
 ;;;### (autoloads (jde-bsh-run jde-compile-jde jde-show-help jde-mode
-;;;;;;  jde-build jde-set-global-classpath) "jde" "jde.el" (18821
-;;;;;;  46869))
+;;;;;;  jde-build jde-set-global-classpath) "jde" "jde.el" (19058
+;;;;;;  47045))
 ;;; Generated autoloads from jde.el
 
 (defconst jde-version "2.3.6" "\
